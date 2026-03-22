@@ -1,0 +1,11 @@
+<Window
+    x:Class="HAWindowsCompanion.App.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Home Assistant Companion"
+    MinWidth="480" MinHeight="640">
+
+    <Grid>
+        <Frame x:Name="ContentFrame" />
+    </Grid>
+</Window>

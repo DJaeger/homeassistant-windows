@@ -1,0 +1,58 @@
+## [vNext] Visual Studio / .NET Core
+## Visual Studio
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.userosscache
+*.sln.docstates
+
+## .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Build results
+[Rr]elease/
+[Dd]ebug/
+x64/
+x86/
+ARM/
+ARM64/
+_TeamCity*
+[Ll]og/
+[Ll]ogs/
+
+## User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## OS-specific files
+.DS_Store
+Thumbs.db
+
+## WinUI 3 / Windows App SDK
+AppPackages/
+BundleArtifacts/
+Generated Files/
+_pkg/
+
+## Publish folders
+publish/
+publish_local/
+*.zip
+build_fixed.log
+app_build.log
+/AssetGenerator/
+/original_logo.png
+
+## Documentation
+site/
+.mkdocs_build/
+
+## Local Environment
+.env
+*.local.json

@@ -1,0 +1,21 @@
+<Page
+    x:Class="HAWindowsCompanion.App.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ScrollViewer>
+        <StackPanel Padding="24" Spacing="24">
+            <TextBlock Text="Settings" Style="{StaticResource TitleTextBlockStyle}" />
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="General" Style="{StaticResource SubtitleTextBlockStyle}" />
+                <ToggleSwitch Header="Launch at Windows Startup" IsOn="{x:Bind ViewModel.LaunchAtStartup, Mode=TwoWay}" />
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="Sensors" Style="{StaticResource SubtitleTextBlockStyle}" />
+                <NumberBox Header="Update Interval (Seconds)" Value="{x:Bind ViewModel.UpdateInterval, Mode=TwoWay}" SmallChange="5" LargeChange="30" SpinButtonPlacementMode="Compact" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

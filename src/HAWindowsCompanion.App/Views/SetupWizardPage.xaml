@@ -1,0 +1,44 @@
+<Page
+    x:Class="HAWindowsCompanion.App.Views.SetupWizardPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:HAWindowsCompanion.Core.Models">
+
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="500">
+        <StackPanel Spacing="24">
+            <TextBlock Text="Welcome to Home Assistant" Style="{StaticResource TitleLargeTextBlockStyle}" HorizontalAlignment="Center" />
+            <TextBlock Text="Set up your Windows PC as a companion device." HorizontalAlignment="Center" Opacity="0.8" />
+
+            <Grid IsEnabled="{x:Bind ViewModel.IsConnecting, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}, FallbackValue=True}">
+                <StackPanel Spacing="16">
+                    <Button Content="Scan for Instances" Command="{x:Bind ViewModel.ScanInstancesCommand}" HorizontalAlignment="Stretch" />
+                    
+                    <ProgressRing IsActive="{x:Bind ViewModel.IsScanning, Mode=OneWay}" />
+
+                    <ListView ItemsSource="{x:Bind ViewModel.DiscoveredInstances}" SelectionMode="Single" x:Name="InstanceList">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="models:DiscoveredInstance">
+                                <StackPanel Padding="8">
+                                    <TextBlock Text="{x:Bind HostName}" FontWeight="Bold" />
+                                    <TextBlock Text="{x:Bind Url}" Opacity="0.6" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <TextBlock Text="Or enter URL manually:" Margin="0,12,0,0" />
+                    <TextBox Text="{x:Bind ViewModel.CustomInstanceUrl, Mode=TwoWay}" PlaceholderText="http://homeassistant.local:8123" />
+
+                    <Button Content="Connect &amp; Authenticate" 
+                            Command="{x:Bind ViewModel.ConnectInstanceCommand}" 
+                            CommandParameter="{x:Bind InstanceList.SelectedItem, Mode=OneWay}"
+                            Style="{StaticResource AccentButtonStyle}" 
+                            HorizontalAlignment="Stretch" />
+                </StackPanel>
+            </Grid>
+
+            <ProgressRing IsActive="{x:Bind ViewModel.IsConnecting, Mode=OneWay}" />
+            <TextBlock Text="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}" Foreground="Red" TextWrapping="Wrap" />
+        </StackPanel>
+    </Grid>
+</Page>

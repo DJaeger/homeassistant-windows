@@ -1,0 +1,25 @@
+site_name: Home Assistant Windows Companion
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: light blue
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: cyan
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Features: features.md
+  - Troubleshooting: troubleshooting.md
+  - Development: development.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - attr_list
