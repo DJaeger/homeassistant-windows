@@ -61,7 +61,7 @@ public partial class App : Application
                 services.AddSingleton<ISensorProvider, AudioOutputDeviceSensor>();
                 services.AddSingleton<ISensorProvider, NetworkSsidSensor>();
                 services.AddSingleton<ISensorProvider, LocationSensor>();
-                services.AddSingleton<SensorManager>();
+                services.AddHostedService<SensorManager>();
 
                 // Notification Service
                 services.AddSingleton<INotificationService, ToastNotificationService>();
@@ -71,7 +71,7 @@ public partial class App : Application
                 services.AddSingleton<ICommandHandler, LockSessionCommandHandler>();
                 services.AddSingleton<ICommandHandler, ShutdownCommandHandler>();
                 services.AddSingleton<ICommandHandler, MediaPlayPauseCommandHandler>();
-                services.AddSingleton<CommandDispatcher>();
+                services.AddHostedService<CommandDispatcher>();
 
                 // ViewModels
                 services.AddTransient<SetupWizardViewModel>();
