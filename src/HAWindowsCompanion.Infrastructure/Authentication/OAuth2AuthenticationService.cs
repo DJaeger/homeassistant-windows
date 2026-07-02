@@ -68,12 +68,12 @@ public sealed class OAuth2AuthenticationService : IAuthenticationService
         // Send success response to browser
         var responseHtml = """
             <html><body style="font-family:Segoe UI,sans-serif;text-align:center;padding:40px">
-            <h2>✅ Authentication Successful</h2>
+            <h2>&#x2705; Authentication Successful</h2>
             <p>You can close this tab and return to the app.</p>
             </body></html>
             """;
         var buffer = Encoding.UTF8.GetBytes(responseHtml);
-        context.Response.ContentType = "text/html";
+        context.Response.ContentType = "text/html; charset=utf-8";
         context.Response.ContentLength64 = buffer.Length;
         await context.Response.OutputStream.WriteAsync(buffer);
         context.Response.Close();
