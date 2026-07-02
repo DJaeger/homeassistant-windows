@@ -54,7 +54,7 @@ public sealed class MemoryUsageSensor : ISensorProvider
     private static extern bool GlobalMemoryStatusEx([In, Out] ref MEMORYSTATUSEX lpBuffer);
 
     private static double GetMemoryUsage()
-        {
+    {
         var memStatus = new MEMORYSTATUSEX { dwLength = (uint)Marshal.SizeOf<MEMORYSTATUSEX>() };
         if (GlobalMemoryStatusEx(ref memStatus))
         {
@@ -68,11 +68,17 @@ public sealed class MemoryUsageSensor : ISensorProvider
         var memStatus = new MEMORYSTATUSEX { dwLength = (uint)Marshal.SizeOf<MEMORYSTATUSEX>() };
         if (GlobalMemoryStatusEx(ref memStatus))
         {
-        return new Dictionary<string, object>
-        {
-                ["total_memory_gb"] = Math.Round(memStatus.ullTotalPhys / 1073741824.0, 2)
-        };
-    }
+            return new Dictionary<string, object>
+            {
+                ["total_memory_bytes"] = memStatus.ullTotalPhys,
+                ["available_memory_bytes"] = memStatus.ullAvailPhys,
+                ["total_page_file_bytes"] = memStatus.ullTotalPageFile,
+                ["available_page_file_bytes"] = memStatus.ullAvailPageFile,
+                ["total_virtual_bytes"] = memStatus.ullTotalVirtual,
+                ["available_virtual_bytes"] = memStatus.ullAvailVirtual,
+                ["available_extended_virtual_bytes"] = memStatus.ullAvailExtendedVirtual
+            };
+        }
         return new Dictionary<string, object>();
     }
 }
