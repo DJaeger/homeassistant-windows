@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 using HAWindowsCompanion.App.ViewModels;
 
@@ -8,9 +7,9 @@ public sealed partial class MainPage : Page
 {
     public MainViewModel ViewModel { get; }
 
-    public MainPage()
+    public MainPage(MainViewModel viewModel)
     {
+        ViewModel = viewModel;
         InitializeComponent();
-        ViewModel = App.Services.GetRequiredService<MainViewModel>();
     }
 }
