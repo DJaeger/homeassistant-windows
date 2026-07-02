@@ -117,6 +117,7 @@ public partial class SetupWizardViewModel : ObservableObject
             await _settingsService.SetAsync("SensorUpdateIntervalSeconds", 60);
 
             // 4. Move to success/main
+            _navigationService.ClearBackStack();
             _navigationService.Navigate(typeof(MainPage));
         }
         catch (Exception ex)

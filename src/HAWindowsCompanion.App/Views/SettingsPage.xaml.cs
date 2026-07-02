@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 using HAWindowsCompanion.App.ViewModels;
 
@@ -8,9 +7,9 @@ public sealed partial class SettingsPage : Page
 {
     public SettingsViewModel ViewModel { get; }
 
-    public SettingsPage()
+    public SettingsPage(SettingsViewModel viewModel)
     {
+        ViewModel = viewModel;
         InitializeComponent();
-        ViewModel = App.Services.GetRequiredService<SettingsViewModel>();
     }
 }

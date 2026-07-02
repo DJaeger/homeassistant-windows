@@ -2,10 +2,10 @@ using System;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using WinRT.Interop;
+using HAWindowsCompanion.App.Services;
 using HAWindowsCompanion.App.Views;
 
 namespace HAWindowsCompanion.App;
@@ -19,6 +19,7 @@ public sealed partial class MainWindow : Window
     private const int MinWidth = 480;
     private const int MinHeight = 640;
 
+    private readonly NavigationService _navigationService;
     private IntPtr _hwnd;
     private IntPtr _oldWndProc;
     private WndProc? _newWndProc;
@@ -27,13 +28,18 @@ public sealed partial class MainWindow : Window
     public ICommand OpenSettingsCommand { get; }
     public ICommand QuitCommand { get; }
 
-    public MainWindow()
+    public MainWindow(NavigationService navigationService)
     {
+        _navigationService = navigationService;
+
         ShowWindowCommand = new RelayCommand(ShowWindow);
-        OpenSettingsCommand = new RelayCommand(OpenSettings);
+        OpenSettingsCommand = new RelayCommand(NavigateToSettings);
         QuitCommand = new RelayCommand(QuitApplication);
 
         InitializeComponent();
+
+        // Initialize NavigationService with ContentFrame
+        _navigationService.Initialize(ContentFrame);
 
         Title = "Home Assistant Companion";
         ExtendsContentIntoTitleBar = true;
@@ -52,8 +58,6 @@ public sealed partial class MainWindow : Window
         _hwnd = WindowNative.GetWindowHandle(this);
         _newWndProc = new WndProc(WindowProc);
         _oldWndProc = SetWindowLongPtr(_hwnd, GWLP_WNDPROC, Marshal.GetFunctionPointerForDelegate(_newWndProc));
-
-        // Navigation will be handled by App.xaml.cs based on configuration state
     }
 
     private void OnClosing(AppWindow sender, AppWindowClosingEventArgs args)
@@ -73,10 +77,20 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void OpenSettings()
+    public void NavigateToMainPage()
+    {
+        _navigationService.Navigate(typeof(MainPage));
+    }
+
+    public void NavigateToSetupWizard()
+    {
+        _navigationService.Navigate(typeof(SetupWizardPage));
+    }
+
+    public void NavigateToSettings()
     {
         ShowWindow();
-        ContentFrame.Navigate(typeof(SettingsPage));
+        _navigationService.Navigate(typeof(SettingsPage));
     }
 
     private void QuitApplication()

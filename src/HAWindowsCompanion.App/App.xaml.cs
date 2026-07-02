@@ -27,6 +27,7 @@ public partial class App : Application
     private static readonly Mutex _singleInstanceMutex = new(true, "HAWindowsCompanion_SingleInstance");
 
     public static IServiceProvider Services => ((App)Current)._host.Services;
+    public static MainWindow? MainWindow => ((App)Current)._window as MainWindow;
 
     public App()
     {
@@ -77,8 +78,16 @@ public partial class App : Application
                 services.AddTransient<SettingsViewModel>();
                 services.AddTransient<MainViewModel>();
 
+                // Views
+                services.AddTransient<MainPage>();
+                services.AddTransient<SettingsPage>();
+                services.AddTransient<SetupWizardPage>();
+
                 // Navigation
                 services.AddSingleton<NavigationService>();
+
+                // MainWindow
+                services.AddTransient<MainWindow>();
             })
             .Build();
     }
@@ -95,18 +104,22 @@ public partial class App : Application
 
         await _host.StartAsync();
 
-        _window = new MainWindow();
+        _window = Services.GetRequiredService<MainWindow>();
 
         var settings = Services.GetRequiredService<ISettingsService>();
         var isConfigured = await settings.GetAsync<bool>("IsConfigured");
 
+        var mainWindow = (MainWindow)_window;
+
         if (!isConfigured)
         {
             // Show setup wizard on first run
-            if (_window.Content is Microsoft.UI.Xaml.Controls.Frame frame)
-            {
-                frame.Navigate(typeof(SetupWizardPage));
-            }
+            mainWindow.NavigateToSetupWizard();
+        }
+        else
+        {
+            // Show main page if already configured
+            mainWindow.NavigateToMainPage();
         }
 
         _window.Activate();
