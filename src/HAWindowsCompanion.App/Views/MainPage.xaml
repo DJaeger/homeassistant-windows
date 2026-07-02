@@ -5,12 +5,39 @@
     xmlns:viewmodels="using:HAWindowsCompanion.App.ViewModels"
     NavigationCacheMode="Enabled">
 
-    <Grid Padding="24">
-        <StackPanel Spacing="12">
-            <TextBlock Text="Home Assistant Companion" Style="{StaticResource TitleTextBlockStyle}" />
-            <TextBlock Text="{x:Bind ViewModel.ServerUrl, Mode=OneWay}" Style="{StaticResource BodyTextBlockStyle}" Opacity="0.6" />
-            
-            <InfoBar Title="Status" Message="{x:Bind ViewModel.ConnectionStatus, Mode=OneWay}" IsOpen="True" Severity="Informational" />
+    <Grid Padding="24" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Spacing="4">
+                <TextBlock Text="Home Assistant Companion" Style="{StaticResource TitleTextBlockStyle}" />
+                <TextBlock Text="{x:Bind ViewModel.ServerUrl, Mode=OneWay}" Style="{StaticResource BodyTextBlockStyle}" Opacity="0.6" />
+            </StackPanel>
+
+            <Button Grid.Column="1"
+                    Command="{x:Bind ViewModel.OpenSettingsCommand, Mode=OneTime}"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Padding="8"
+                    Margin="0 15 0 0"
+                    Background="Transparent"
+                    BorderBrush="Transparent" 
+                    ToolTipService.ToolTip="Open Settings"
+                    AutomationProperties.Name="Settings">
+                <SymbolIcon Symbol="Setting" />
+            </Button>
+        </Grid>
+
+        <StackPanel Grid.Row="1" Spacing="12">
+            <InfoBar Title="Status" Message="{x:Bind ViewModel.ConnectionStatus, Mode=OneWay}" IsOpen="True" IsClosable="False" Severity="Informational" />
 
             <TextBlock Text="Active Sensors" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,4" />
             <ListView ItemsSource="{x:Bind ViewModel.ActiveSensors}">
