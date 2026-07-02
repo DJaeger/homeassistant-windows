@@ -14,13 +14,16 @@ namespace HAWindowsCompanion.Infrastructure.Authentication;
 /// </summary>
 public sealed class OAuth2AuthenticationService : IAuthenticationService
 {
-    private const string ClientId = "https://github.com/home-assistant/homeassistant-windows";
     private const string RedirectPath = "/auth/callback";
     private const int CallbackPort = 18123;
+    private const string CallbackHost = "localhost";
 
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ICredentialStore _credentialStore;
     private readonly ILogger<OAuth2AuthenticationService> _logger;
+
+    // client_id must be the same host:port as redirect_uri
+    private readonly string _clientId = $"http://{CallbackHost}:{CallbackPort}";
 
     private TokenInfo? _currentToken;
     private string? _instanceUrl;
@@ -39,17 +42,18 @@ public sealed class OAuth2AuthenticationService : IAuthenticationService
     {
         _instanceUrl = instanceUrl.TrimEnd('/');
 
-        var redirectUri = $"http://localhost:{CallbackPort}{RedirectPath}";
+        var redirectUri = $"http://{CallbackHost}:{CallbackPort}{RedirectPath}";
+
         var authorizeUrl = $"{_instanceUrl}/auth/authorize" +
-            $"?client_id={Uri.EscapeDataString(ClientId)}" +
+            $"?client_id={Uri.EscapeDataString(_clientId)}" +
             $"&redirect_uri={Uri.EscapeDataString(redirectUri)}" +
             $"&state={Uri.EscapeDataString(_instanceUrl)}";
 
-        _logger.LogInformation("Starting OAuth2 flow for {InstanceUrl}", _instanceUrl);
+        _logger.LogInformation("Starting OAuth2 flow for {InstanceUrl} with client_id={ClientId}", _instanceUrl, _clientId);
 
         // Start local listener for callback
         using var listener = new HttpListener();
-        listener.Prefixes.Add($"http://localhost:{CallbackPort}/");
+        listener.Prefixes.Add($"http://{CallbackHost}:{CallbackPort}/");
         listener.Start();
 
         // Open system browser for authentication
@@ -85,14 +89,14 @@ public sealed class OAuth2AuthenticationService : IAuthenticationService
     public async Task<TokenInfo> ExchangeCodeAsync(string instanceUrl, string code)
     {
         _instanceUrl = instanceUrl.TrimEnd('/');
-        var redirectUri = $"http://localhost:{CallbackPort}{RedirectPath}";
+        var redirectUri = $"http://{CallbackHost}:{CallbackPort}{RedirectPath}";
 
         var client = _httpClientFactory.CreateClient();
         var content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
             ["grant_type"] = "authorization_code",
             ["code"] = code,
-            ["client_id"] = ClientId
+            ["client_id"] = _clientId
         });
 
         var response = await client.PostAsync($"{_instanceUrl}/auth/token", content);
@@ -118,7 +122,7 @@ public sealed class OAuth2AuthenticationService : IAuthenticationService
         {
             ["grant_type"] = "refresh_token",
             ["refresh_token"] = refreshToken,
-            ["client_id"] = ClientId
+            ["client_id"] = _clientId
         });
 
         var response = await client.PostAsync($"{instanceUrl.TrimEnd('/')}/auth/token", content);
