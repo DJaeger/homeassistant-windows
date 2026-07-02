@@ -26,6 +26,9 @@ public partial class SetupWizardViewModel : ObservableObject
     [ObservableProperty] private bool _isConnecting = false;
     [ObservableProperty] private string? _errorMessage;
 
+    // Computed property for Border.IsHitTestVisible binding
+    public bool IsNotConnecting => !IsConnecting;
+
     public ObservableCollection<DiscoveredInstance> DiscoveredInstances { get; } = new();
 
     public SetupWizardViewModel(
@@ -42,6 +45,12 @@ public partial class SetupWizardViewModel : ObservableObject
         _credentialStore = credentialStore;
         _settingsService = settingsService;
         _navigationService = navigationService;
+    }
+
+    // Notify IsNotConnecting when IsConnecting changes
+    partial void OnIsConnectingChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsNotConnecting));
     }
 
     [RelayCommand]

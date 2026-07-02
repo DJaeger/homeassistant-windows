@@ -9,10 +9,10 @@
             <TextBlock Text="Welcome to Home Assistant" Style="{StaticResource TitleLargeTextBlockStyle}" HorizontalAlignment="Center" />
             <TextBlock Text="Set up your Windows PC as a companion device." HorizontalAlignment="Center" Opacity="0.8" />
 
-            <Grid IsEnabled="{x:Bind ViewModel.IsConnecting, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}, FallbackValue=True}">
+            <Grid IsHitTestVisible="{x:Bind ViewModel.IsNotConnecting, Mode=OneWay, FallbackValue=True}">
                 <StackPanel Spacing="16">
                     <Button Content="Scan for Instances" Command="{x:Bind ViewModel.ScanInstancesCommand}" HorizontalAlignment="Stretch" />
-                    
+
                     <ProgressRing IsActive="{x:Bind ViewModel.IsScanning, Mode=OneWay}" />
 
                     <ListView ItemsSource="{x:Bind ViewModel.DiscoveredInstances}" SelectionMode="Single" x:Name="InstanceList">
