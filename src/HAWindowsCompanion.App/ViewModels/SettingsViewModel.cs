@@ -1,6 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HAWindowsCompanion.Core.Interfaces;
+using HAWindowsCompanion.App.Services;
+using HAWindowsCompanion.App.Views;
 
 namespace HAWindowsCompanion.App.ViewModels;
 
@@ -8,14 +10,16 @@ public partial class SettingsViewModel : ObservableObject
 {
     private readonly ISettingsService _settingsService;
     private readonly IStartupManager _startupManager;
+    private readonly NavigationService _navigationService;
 
     [ObservableProperty] private int _updateInterval = 60;
     [ObservableProperty] private bool _launchAtStartup;
 
-    public SettingsViewModel(ISettingsService settingsService, IStartupManager startupManager)
+    public SettingsViewModel(ISettingsService settingsService, IStartupManager startupManager, NavigationService navigationService)
     {
         _settingsService = settingsService;
         _startupManager = startupManager;
+        _navigationService = navigationService;
         LoadSettings();
     }
 
@@ -35,5 +39,11 @@ public partial class SettingsViewModel : ObservableObject
     {
         if (value) _startupManager.EnableStartup();
         else _startupManager.DisableStartup();
+    }
+
+    [RelayCommand]
+    private void NavigateToMain()
+    {
+        _navigationService.Navigate(typeof(MainPage));
     }
 }
