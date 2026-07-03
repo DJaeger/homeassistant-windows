@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using HAWindowsCompanion.App.Services;
 using HAWindowsCompanion.App.ViewModels;
@@ -9,6 +10,7 @@ using HAWindowsCompanion.Infrastructure.Api;
 using HAWindowsCompanion.Infrastructure.Authentication;
 using HAWindowsCompanion.Infrastructure.Commands;
 using HAWindowsCompanion.Infrastructure.Discovery;
+using HAWindowsCompanion.Infrastructure.Logging;
 using HAWindowsCompanion.Infrastructure.Platform;
 using HAWindowsCompanion.Infrastructure.Sensors;
 
@@ -33,6 +35,29 @@ public partial class App : Application
         InitializeComponent();
 
         _host = Host.CreateDefaultBuilder()
+            .ConfigureLogging((context, logging) =>
+            {
+                // Check if file logging is enabled (DI-friendly approach)
+                var tempServices = new ServiceCollection();
+                tempServices.AddSingleton<ISettingsService, SettingsService>();
+                var tempProvider = tempServices.BuildServiceProvider();
+                var settingsService = tempProvider.GetRequiredService<ISettingsService>();
+
+                var isFileLoggingEnabled = settingsService.GetAsync<bool>("IsFileLoggingEnabled").GetAwaiter().GetResult();
+
+                if (isFileLoggingEnabled)
+                {
+                    var options = new FileLoggerOptions();
+                    logging.AddProvider(new FileLoggerProvider(options));
+                }
+
+                // Increase log level for debug builds
+#if DEBUG
+                logging.SetMinimumLevel(LogLevel.Debug);
+#else
+                logging.SetMinimumLevel(LogLevel.Information);
+#endif
+            })
             .ConfigureServices((context, services) =>
             {
                 // Platform services
@@ -87,7 +112,10 @@ public partial class App : Application
                 services.AddSingleton<NavigationService>();
 
                 // MainWindow
-                services.AddTransient<MainWindow>();
+                services.AddSingleton<MainWindow>();
+
+                // Register MainWindow Commands Interface
+                services.AddSingleton<IMainWindowCommands>(sp => sp.GetRequiredService<MainWindow>());
             })
             .Build();
     }
