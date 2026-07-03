@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
@@ -77,17 +76,17 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    public void NavigateToMainPage()
+    internal void NavigateToMainPage()
     {
         _navigationService.Navigate(typeof(MainPage));
     }
 
-    public void NavigateToSetupWizard()
+    internal void NavigateToSetupWizard()
     {
         _navigationService.Navigate(typeof(SetupWizardPage));
     }
 
-    public void NavigateToSettings()
+    internal void NavigateToSettings()
     {
         ShowWindow();
         _navigationService.Navigate(typeof(SettingsPage));

@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Windows.Security.Credentials;
 using HAWindowsCompanion.Core.Interfaces;
 using HAWindowsCompanion.Core.Models;

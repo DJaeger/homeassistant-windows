@@ -1,5 +1,3 @@
-using System;
-using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
@@ -110,18 +108,17 @@ public partial class App : Application
 
         var settings = Services.GetRequiredService<ISettingsService>();
         var isConfigured = await settings.GetAsync<bool>("IsConfigured");
-
-        var mainWindow = (MainWindow)_window;
+        var navigationService = Services.GetRequiredService<NavigationService>();
 
         if (!isConfigured)
         {
             // Show setup wizard on first run
-            mainWindow.NavigateToSetupWizard();
+            navigationService.Navigate(typeof(SetupWizardPage));
         }
         else
         {
             // Show main page if already configured
-            mainWindow.NavigateToMainPage();
+            navigationService.Navigate(typeof(MainPage));
         }
 
         _window.Activate();

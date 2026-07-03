@@ -1,6 +1,4 @@
-using System;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HAWindowsCompanion.App.Services;
@@ -11,7 +9,7 @@ using HAWindowsCompanion.Infrastructure.Sensors;
 
 namespace HAWindowsCompanion.App.ViewModels;
 
-public sealed partial class MainViewModel : ObservableObject
+public partial class MainViewModel : ObservableObject
 {
     private readonly IEnumerable<ISensorProvider> _sensors;
     private readonly ICredentialStore _credentialStore;
@@ -22,7 +20,6 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _serverUrl = "Not configured";
 
     public ObservableCollection<SensorInfo> ActiveSensors { get; } = new();
-    public ICommand OpenSettingsCommand { get; }
 
     public MainViewModel(
         IEnumerable<ISensorProvider> sensors,
@@ -35,36 +32,44 @@ public sealed partial class MainViewModel : ObservableObject
         _locationTrackerService = locationTrackerService;
         _navigationService = navigationService;
 
-        OpenSettingsCommand = new RelayCommand(() => _navigationService.Navigate(typeof(SettingsPage)));
-
-        LoadStatus();
+        _ = LoadStatusAsync(); // Intentionally not awaited because asynchronous work cannot be awaited in the constructor.
     }
 
-    private async void LoadStatus()
-    {
-        var server = await _credentialStore.LoadServerInfoAsync();
-        if (server != null)
-        {
-            ServerUrl = server.InstanceUrl;
-            ConnectionStatus = "Connected";
-        }
+    [RelayCommand]
+    private void OpenSettings() => _navigationService.Navigate(typeof(SettingsPage));
 
-        foreach (var sensor in _sensors)
+    private async Task LoadStatusAsync()
+    {
+        try
         {
-            ActiveSensors.Add(new SensorInfo 
-            { 
-                Name = sensor.Name, 
-                Value = sensor.GetCurrentState().State?.ToString() ?? "N/A" 
+            var server = await _credentialStore.LoadServerInfoAsync();
+            if (server != null)
+            {
+                ServerUrl = server.InstanceUrl;
+                ConnectionStatus = "Connected";
+            }
+
+            foreach (var sensor in _sensors)
+            {
+                ActiveSensors.Add(new SensorInfo 
+                { 
+                    Name = sensor.Name, 
+                    Value = sensor.GetCurrentState().State?.ToString() ?? "N/A" 
+                });
+            }
+
+            var trackerSnapshot = _locationTrackerService.CurrentStatus;
+            ActiveSensors.Add(new SensorInfo
+            {
+                Name = "Location Tracker",
+                Value = BuildLocationValue(trackerSnapshot.LocationName, trackerSnapshot.Attributes),
+                Details = BuildLocationDetails(trackerSnapshot.Attributes)
             });
         }
-
-        var trackerSnapshot = _locationTrackerService.CurrentStatus;
-        ActiveSensors.Add(new SensorInfo
+        catch (Exception ex)
         {
-            Name = "Location Tracker",
-            Value = BuildLocationValue(trackerSnapshot.LocationName, trackerSnapshot.Attributes),
-            Details = BuildLocationDetails(trackerSnapshot.Attributes)
-        });
+            ConnectionStatus = $"Error: {ex.Message}";
+        }
     }
 
     private static string BuildLocationValue(string locationName, Dictionary<string, object> attributes)
