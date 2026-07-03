@@ -50,6 +50,7 @@ public partial class App : Application
 
                 // HA API client
                 services.AddSingleton<IHomeAssistantClient, HomeAssistantApiClient>();
+                services.AddSingleton<IHomeZoneService, HomeZoneService>();
                 services.AddHttpClient();
 
                 // Sensors — register all providers
@@ -60,8 +61,9 @@ public partial class App : Application
                 services.AddSingleton<ISensorProvider, SystemIdleTimeSensor>();
                 services.AddSingleton<ISensorProvider, AudioOutputDeviceSensor>();
                 services.AddSingleton<ISensorProvider, NetworkSsidSensor>();
-                services.AddSingleton<ISensorProvider, LocationSensor>();
                 services.AddHostedService<SensorManager>();
+                services.AddSingleton<LocationTrackerService>();
+                services.AddHostedService(provider => provider.GetRequiredService<LocationTrackerService>());
 
                 // Notification Service
                 services.AddSingleton<INotificationService, ToastNotificationService>();

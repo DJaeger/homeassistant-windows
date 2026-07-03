@@ -48,8 +48,8 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="1" Text="{x:Bind Value}" Foreground="{ThemeResource AccentFillColorDefaultBrush}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center" ToolTipService.ToolTip="{x:Bind Details}" />
+                            <TextBlock Grid.Column="1" Text="{x:Bind Value}" Foreground="{ThemeResource AccentFillColorDefaultBrush}" FontWeight="SemiBold" VerticalAlignment="Center" ToolTipService.ToolTip="{x:Bind Details}" />
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
