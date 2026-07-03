@@ -30,4 +30,62 @@ Encountering issues? Follow this guide to resolve common problems with the Windo
 
 ## 📝 Logging
 
-For advanced troubleshooting, logs are stored in `%LOCALAPPDATA%\HAWindowsCompanion\logs`. Please include these when reporting issues on GitHub.
+### Enabling File Logging
+
+File logging is **disabled by default** to save storage space. You can enable it in the Settings when needed:
+
+1. Open **Settings** via the system tray icon
+2. Scroll to the **"Debugging"** section
+3. Enable **"File Logging aktivieren"**
+4. Click **"App neu starten"** to apply the change
+
+**⚠️ Note:** An application restart is required for file logging to become active.
+
+### Finding Log Files
+
+After activation, all logs are automatically saved to:
+
+```
+%LOCALAPPDATA%\HAWindowsCompanion\logs\
+```
+
+You can open the folder directly via the **"Log-Ordner öffnen"** button in Settings.
+
+### Log Format
+
+Each log line follows this format:
+
+```
+[YYYY-MM-DD HH:mm:ss] [LogLevel] Category: Message
+```
+
+**Example:**
+```
+[2026-03-15 14:23:45] [Information] HAWindowsCompanion.Infrastructure.Commands.CommandDispatcher: CommandDispatcher service starting...
+[2026-03-15 14:23:46] [Warning] HAWindowsCompanion.Infrastructure.Sensors.SensorManager: Failed to update sensor battery_level
+[2026-03-15 14:23:47] [Error] HAWindowsCompanion.Infrastructure.Api.HomeAssistantApiClient: Connection refused
+```
+
+**Log Levels:**
+- `[Debug]` - Detailed information for developers
+- `[Information]` - General status messages
+- `[Warning]` - Warnings that require attention
+- `[Error]` - Errors that should be fixed
+- `[Critical]` - Critical errors affecting the application
+
+### Log Rotation and Storage
+
+- **Daily new file:** The app automatically creates a new log file per day (format: `app-YYYY-MM-DD.log`)
+- **Automatic cleanup:** Log files older than **7 days** are automatically removed
+- **Storage usage:** Under normal operation, logs only consume a few MB
+
+### Providing Logs for GitHub Issues
+
+When reporting a problem on GitHub, please include the relevant log files:
+
+1. Enable file logging (if not already enabled)
+2. Reproduce the issue
+3. Open the log folder via **"Log-Ordner öffnen"**
+4. Upload the most recent `app-YYYY-MM-DD.log` file
+
+**Note:** Please check the logs for sensitive information (e.g., passwords, API keys) before sharing them publicly.

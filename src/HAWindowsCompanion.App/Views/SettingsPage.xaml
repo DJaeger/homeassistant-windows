@@ -47,6 +47,51 @@
                     <TextBlock Text="Sensors" Style="{StaticResource SubtitleTextBlockStyle}" />
                     <NumberBox Header="Update Interval (Seconds)" Value="{x:Bind ViewModel.UpdateInterval, Mode=TwoWay}" SmallChange="5" LargeChange="30" SpinButtonPlacementMode="Compact" />
                 </StackPanel>
+
+                <StackPanel Spacing="8">
+                    <TextBlock 
+                        Text="Debugging" 
+                        Style="{StaticResource SubtitleTextBlockStyle}" />
+
+                    <!-- Restart notice (only visible when required) -->
+                    <InfoBar
+                        x:Name="RestartInfoBar"
+                        Severity="Warning"
+                        IsOpen="{x:Bind ViewModel.IsRestartRequired, Mode=OneWay}"
+                        Title="Restart Required"
+                        Message="The change will take effect after restarting the application.">
+                        <InfoBar.ActionButton>
+                            <Button 
+                                Content="Restart App"
+                                Command="{x:Bind ViewModel.RestartApplicationCommand}"
+                                AutomationProperties.Name="Restart application" />
+                        </InfoBar.ActionButton>
+                    </InfoBar>
+
+                    <ToggleSwitch 
+                        Header="Enable File Logging"
+                        IsOn="{x:Bind ViewModel.IsFileLoggingEnabled, Mode=TwoWay}"
+                        OnContent="Enabled"
+                        OffContent="Disabled"
+                        AutomationProperties.Name="Enable or disable file logging" />
+
+                    <TextBlock 
+                        TextWrapping="Wrap"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Margin="0,4,0,0">
+                        <Run Text="Writes detailed logs to:" />
+                        <LineBreak />
+                        <Run Text="%LOCALAPPDATA%\HAWindowsCompanion\logs\" FontFamily="Consolas" />
+                        <LineBreak />
+                        <Run Text="Format: [YYYY-MM-DD HH:mm:ss] [Level] Category: Message" FontFamily="Consolas" FontSize="11" />
+                    </TextBlock>
+
+                    <HyperlinkButton 
+                        Content="Open Log Folder"
+                        Command="{x:Bind ViewModel.OpenLogFolderCommand}"
+                        Margin="0,8,0,0"
+                        AutomationProperties.Name="Open log folder in Explorer" />
+                </StackPanel>
             </StackPanel>
         </ScrollViewer>
     </Grid>

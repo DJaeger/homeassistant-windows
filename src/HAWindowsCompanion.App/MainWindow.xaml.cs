@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
@@ -13,7 +14,7 @@ namespace HAWindowsCompanion.App;
 /// Main application window with system tray integration.
 /// Minimizes to tray on close, stays running in the background.
 /// </summary>
-public sealed partial class MainWindow : Window
+public sealed partial class MainWindow : Window, IMainWindowCommands
 {
     private const int MinWidth = 480;
     private const int MinHeight = 640;
@@ -26,6 +27,7 @@ public sealed partial class MainWindow : Window
     public ICommand ShowWindowCommand { get; }
     public ICommand OpenSettingsCommand { get; }
     public ICommand QuitCommand { get; }
+    public ICommand RestartCommand { get; }
 
     public MainWindow(NavigationService navigationService)
     {
@@ -34,6 +36,7 @@ public sealed partial class MainWindow : Window
         ShowWindowCommand = new RelayCommand(ShowWindow);
         OpenSettingsCommand = new RelayCommand(NavigateToSettings);
         QuitCommand = new RelayCommand(QuitApplication);
+        RestartCommand = new RelayCommand(RestartApplication);
 
         InitializeComponent();
 
@@ -98,6 +101,27 @@ public sealed partial class MainWindow : Window
         AppWindow.Closing -= OnClosing;
         Close();
         Application.Current.Exit();
+    }
+
+    private void RestartApplication()
+    {
+        try
+        {
+            // Start new instance
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = Environment.ProcessPath ?? throw new InvalidOperationException("Cannot determine executable path"),
+                UseShellExecute = true
+            });
+
+            // Clean shutdown of current instance
+            QuitApplication();
+        }
+        catch
+        {
+            // Fallback: quit only
+            QuitApplication();
+        }
     }
 
     private IntPtr WindowProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
