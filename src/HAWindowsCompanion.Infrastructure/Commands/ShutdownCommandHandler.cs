@@ -1,7 +1,5 @@
-using System;
 using System.Diagnostics;
 using System.Text.Json;
-using System.Threading.Tasks;
 using HAWindowsCompanion.Core.Interfaces;
 
 namespace HAWindowsCompanion.Infrastructure.Commands;
