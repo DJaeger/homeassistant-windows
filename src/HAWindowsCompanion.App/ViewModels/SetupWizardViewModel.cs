@@ -1,10 +1,11 @@
 using System.Collections.ObjectModel;
+using System.Management;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using HAWindowsCompanion.Core.Interfaces;
-using HAWindowsCompanion.Core.Models;
 using HAWindowsCompanion.App.Services;
 using HAWindowsCompanion.App.Views;
+using HAWindowsCompanion.Core.Interfaces;
+using HAWindowsCompanion.Core.Models;
 
 namespace HAWindowsCompanion.App.ViewModels;
 
@@ -82,6 +83,16 @@ public partial class SetupWizardViewModel : ObservableObject
         string url = instance?.Url ?? CustomInstanceUrl;
         if (string.IsNullOrEmpty(url)) return;
 
+        string manufacturer = "N/A";
+        string model = "N/A";
+
+        ManagementObjectSearcher searcher = new ManagementObjectSearcher($"SELECT * FROM Win32_ComputerSystem");
+        foreach (ManagementObject obj in searcher.Get())
+        {
+            manufacturer = obj["Manufacturer"]?.ToString() ?? "N/A";
+            model = obj["Model"]?.ToString() ?? "N/A";
+        }
+
         IsConnecting = true;
         ErrorMessage = null;
 
@@ -100,13 +111,13 @@ public partial class SetupWizardViewModel : ObservableObject
                     .Cast<System.Reflection.AssemblyInformationalVersionAttribute>()
                     .FirstOrDefault()?.InformationalVersion ?? "2026.3.0",
                 DeviceName = System.Net.Dns.GetHostName(),
-                Manufacturer = "FaserF",
-                Model = "Windows PC",
+                Manufacturer = manufacturer,
+                Model = model,
                 OsVersion = Environment.OSVersion.VersionString
             };
 
             var serverInfo = await _haClient.RegisterDeviceAsync(url, tokens.AccessToken, registration);
-            
+
             // 3. Persist everything
             await _credentialStore.SaveTokenAsync(tokens);
             await _credentialStore.SaveServerInfoAsync(serverInfo);
