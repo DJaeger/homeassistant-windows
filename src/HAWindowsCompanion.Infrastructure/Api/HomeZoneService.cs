@@ -1,7 +1,8 @@
-using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using HAWindowsCompanion.Core.Interfaces;
 using HAWindowsCompanion.Core.Models;
+using Microsoft.Extensions.Logging;
 
 namespace HAWindowsCompanion.Infrastructure.Api;
 
@@ -9,21 +10,27 @@ public sealed class HomeZoneService : IHomeZoneService
 {
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
 
+    private readonly IHomeAssistantClient _haClient;
     private readonly ICredentialStore _credentialStore;
     private readonly IAuthenticationService _authenticationService;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger<HomeAssistantApiClient> _logger;
 
     private HomeZoneInfo? _cachedHomeZone;
     private DateTimeOffset _cachedAt = DateTimeOffset.MinValue;
 
     public HomeZoneService(
+        IHomeAssistantClient haClient,
         ICredentialStore credentialStore,
         IAuthenticationService authenticationService,
-        IHttpClientFactory httpClientFactory)
+        IHttpClientFactory httpClientFactory,
+        ILogger<HomeAssistantApiClient> logger)
     {
+        _haClient = haClient;
         _credentialStore = credentialStore;
         _authenticationService = authenticationService;
         _httpClientFactory = httpClientFactory;
+        _logger = logger;
     }
 
     public async Task<HomeZoneInfo?> GetHomeZoneAsync()
@@ -35,46 +42,52 @@ public sealed class HomeZoneService : IHomeZoneService
 
         try
         {
-            var serverInfo = await _credentialStore.LoadServerInfoAsync();
-            if (serverInfo is null || string.IsNullOrWhiteSpace(serverInfo.InstanceUrl))
+            var server = await _credentialStore.LoadServerInfoAsync();
+            if (server == null || string.IsNullOrEmpty(server.WebhookId))
             {
+                _logger.LogError("HomeZoneService: Application is marked configured but no server info/webhook ID found.");
                 return null;
             }
 
-            var accessToken = await _authenticationService.GetValidAccessTokenAsync();
-            var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            var request = new WebhookRequest { Type = "get_zones" };
+            var result = await _haClient.SendWebhookAsync<List<JsonElement>>(server, request);
 
-            using var response = await client.GetAsync($"{serverInfo.InstanceUrl.TrimEnd('/')}/api/states/zone.home");
-            if (!response.IsSuccessStatusCode)
-            {
-                return null;
-            }
+            if (result == null) return null;
 
-            var content = await response.Content.ReadAsStringAsync();
-            using var doc = JsonDocument.Parse(content);
+            foreach (var element in result)
 
-            if (!doc.RootElement.TryGetProperty("attributes", out var attributes))
-            {
-                return null;
-            }
+                if (element.TryGetProperty("entity_id", out var entityId))
+                {
+                    if (entityId.GetString() != "zone.home")
+                    {
+                        continue;
+                    }
 
-            if (!attributes.TryGetProperty("latitude", out var latitude)
-                || !attributes.TryGetProperty("longitude", out var longitude)
-                || !attributes.TryGetProperty("radius", out var radius))
-            {
-                return null;
-            }
+                    if (!element.TryGetProperty("attributes", out var attributes))
+                    {
+                        return null;
+                    }
 
-            _cachedHomeZone = new HomeZoneInfo
-            {
-                Latitude = latitude.GetDouble(),
-                Longitude = longitude.GetDouble(),
-                RadiusMeters = radius.GetDouble()
-            };
-            _cachedAt = DateTimeOffset.UtcNow;
+                    if (!attributes.TryGetProperty("latitude", out var latitude)
+                        || !attributes.TryGetProperty("longitude", out var longitude)
+                        || !attributes.TryGetProperty("radius", out var radius))
+                    {
+                        return null;
+                    }
 
-            return _cachedHomeZone;
+                    _cachedHomeZone = new HomeZoneInfo
+                    {
+                        Latitude = latitude.GetDouble(),
+                        Longitude = longitude.GetDouble(),
+                        RadiusMeters = radius.GetDouble()
+                    };
+
+                    _cachedAt = DateTimeOffset.UtcNow;
+
+                    return _cachedHomeZone;
+                }
+
+            return null;
         }
         catch
         {
