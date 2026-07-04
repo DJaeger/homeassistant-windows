@@ -99,7 +99,7 @@ public partial class SetupWizardViewModel : ObservableObject
                     .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
                     .Cast<System.Reflection.AssemblyInformationalVersionAttribute>()
                     .FirstOrDefault()?.InformationalVersion ?? "2026.3.0",
-                DeviceName = Environment.MachineName,
+                DeviceName = System.Net.Dns.GetHostName(),
                 Manufacturer = "FaserF",
                 Model = "Windows PC",
                 OsVersion = Environment.OSVersion.VersionString
