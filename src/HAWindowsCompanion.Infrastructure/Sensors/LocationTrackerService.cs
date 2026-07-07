@@ -21,7 +21,7 @@ public sealed class LocationTrackerService : BackgroundService
     private readonly IHomeAssistantClient _haClient;
     private readonly ICredentialStore _credentialStore;
     private readonly ISettingsService _settingsService;
-    private readonly IHomeZoneService _homeZoneService;
+    private readonly IZonesService _zonesService;
     private readonly ILogger<LocationTrackerService> _logger;
 
     private readonly object _statusLock = new();
@@ -32,13 +32,13 @@ public sealed class LocationTrackerService : BackgroundService
         IHomeAssistantClient haClient,
         ICredentialStore credentialStore,
         ISettingsService settingsService,
-        IHomeZoneService homeZoneService,
+        IZonesService zonesService,
         ILogger<LocationTrackerService> logger)
     {
         _haClient = haClient;
         _credentialStore = credentialStore;
         _settingsService = settingsService;
-        _homeZoneService = homeZoneService;
+        _zonesService = zonesService;
         _logger = logger;
         _geolocator = new Geolocator { DesiredAccuracyInMeters = 50 };
     }
@@ -104,24 +104,29 @@ public sealed class LocationTrackerService : BackgroundService
     {
         try
         {
-            var position = await _geolocator
+            Geoposition position = await _geolocator
                 .GetGeopositionAsync(TimeSpan.FromMinutes(2), TimeSpan.FromSeconds(10))
                 .AsTask(cancellationToken);
 
-            var coordinate = position.Coordinate;
-            var pos = coordinate.Point.Position;
-            var locationName = await ResolveLocationNameAsync(pos.Latitude, pos.Longitude);
+            Geocoordinate coordinate = position.Coordinate;
+            BasicGeoposition pos = coordinate.Point.Position;
+            int accuracy = Math.Max(1, (int)Math.Round(coordinate.Accuracy));
+            List<Zone> zones = await _zonesService.GetZonesForLocationAsync(
+                new Location
+                {
+                    Latitude = pos.Latitude,
+                    Longitude = pos.Longitude,
+                    Accuracy = accuracy
+                }
+            );
 
-            var payload = new Dictionary<string, object>
+            Dictionary<string,object> payload = new Dictionary<string, object>
             {
                 ["gps"] = new[] { pos.Latitude, pos.Longitude },
-                ["gps_accuracy"] = Math.Max(1, (int)Math.Round(coordinate.Accuracy))
+                ["gps_accuracy"] = accuracy
             };
 
-            if (!string.IsNullOrWhiteSpace(locationName))
-            {
-                payload["location_name"] = locationName;
-            }
+            payload["in_zones"] = zones.ConvertAll(zone => zone.EntityId.ToString());
 
             if (!double.IsNaN(pos.Altitude) && !double.IsInfinity(pos.Altitude))
             {
@@ -152,17 +157,18 @@ public sealed class LocationTrackerService : BackgroundService
                 payload["speed"] = (int)Math.Round(coordinate.Speed.Value);
             }
 
-            lock (_statusLock)
-            {
-                _lastLocationName = locationName;
-                _lastAttributes = new Dictionary<string, object>(payload);
-            }
-
             await _haClient.SendWebhookAsync<object>(server, new WebhookRequest
             {
                 Type = "update_location",
                 Data = payload
             });
+
+            payload["in_zones"] = string.Join(", ", zones.ConvertAll(zone => zone.EntityId));
+            lock (_statusLock)
+            {
+                _lastLocationName = zones.FirstOrDefault()?.Name ?? "unknown";
+                _lastAttributes = new Dictionary<string, object>(payload);
+        }
         }
         catch (OperationCanceledException)
         {
@@ -170,42 +176,19 @@ public sealed class LocationTrackerService : BackgroundService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Location unavailable. Reporting unavailable state to Home Assistant.");
+            _logger.LogWarning(ex, "Location unknown. Reporting unknown state to Home Assistant.");
 
             lock (_statusLock)
             {
-                _lastLocationName = "unavailable";
-                _lastAttributes = new Dictionary<string, object>
-                {
-                    ["location_name"] = "unavailable"
-                };
+                _lastLocationName = "unknown";
+                _lastAttributes = new Dictionary<string, object>{};
             }
 
             await _haClient.SendWebhookAsync<object>(server, new WebhookRequest
             {
                 Type = "update_location",
-                Data = new Dictionary<string, object>
-                {
-                    ["location_name"] = "unavailable"
-                }
+                Data = new Dictionary<string, object>{}
             });
         }
-    }
-
-    private async Task<string> ResolveLocationNameAsync(double latitude, double longitude)
-    {
-        var homeZone = await _homeZoneService.GetHomeZoneAsync();
-        if (homeZone is null)
-        {
-            return "unknown";
-        }
-
-        var distance = GeoDistanceCalculator.CalculateDistanceMeters(
-            latitude,
-            longitude,
-            homeZone.Latitude,
-            homeZone.Longitude);
-
-        return distance <= homeZone.RadiusMeters ? "home" : "not_home";
     }
 }

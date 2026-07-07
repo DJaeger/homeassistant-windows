@@ -73,7 +73,7 @@ public partial class App : Application
 
                 // HA API client
                 services.AddSingleton<IHomeAssistantClient, HomeAssistantApiClient>();
-                services.AddSingleton<IHomeZoneService, HomeZoneService>();
+                services.AddSingleton<IZonesService, ZonesService>();
                 services.AddHttpClient();
 
                 // Sensors — register all providers
