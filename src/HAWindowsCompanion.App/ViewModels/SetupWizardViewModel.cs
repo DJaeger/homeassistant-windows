@@ -113,7 +113,10 @@ public partial class SetupWizardViewModel : ObservableObject
                 DeviceName = System.Net.Dns.GetHostName(),
                 Manufacturer = manufacturer,
                 Model = model,
-                OsVersion = Environment.OSVersion.VersionString
+                OsVersion = Environment.OSVersion.VersionString,
+                AppData = new Dictionary<string, object>() {
+                    ["push_websocket_channel"] = true
+                }
             };
 
             var serverInfo = await _haClient.RegisterDeviceAsync(url, tokens.AccessToken, registration);
