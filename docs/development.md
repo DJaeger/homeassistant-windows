@@ -26,7 +26,7 @@ The solution uses **Clean Architecture** to maintain a strict separation of conc
 
 ## 🚀 Getting Started
 
-1. Clone the repository: `git clone https://github.com/fabian-be/homeassistant-windows.git`
+1. Clone the repository: `git clone https://github.com/DJaeger/homeassistant-windows.git`
 2. Open `HAWindowsCompanion.sln` in Visual Studio.
 3. Restore NuGet packages and build the solution.
 4. Run the `App` project.
@@ -40,6 +40,7 @@ dotnet publish src/HAWindowsCompanion.App/HAWindowsCompanion.App.csproj `
   -c Release `
   -r win-x64 `
   -p:PublishSingleFile=true `
+  -p:EnableMsixTooling=true `
   -p:SelfContained=true `
   -p:PublishReadyToRun=true
 ```
