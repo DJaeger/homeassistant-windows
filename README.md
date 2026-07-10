@@ -55,12 +55,11 @@ Control your Windows environment directly from Home Assistant dashboards and aut
 
 ## 📖 Documentation
 
-Detailed documentation is available in the `/docs` folder or via our [Online Documentation Site](https://DJaeger.github.io/homeassistant-windows/).
-
-- [Installation Guide](docs/installation.md)
-- [Feature Details](docs/features.md)
-- [Troubleshooting](docs/troubleshooting.md)
-- [Development Guide](docs/development.md)
+Detailed documentation is available in the `/docs` folder or via our [Online Documentation Site](https://DJaeger.github.io/homeassistant-windows/):
+- [Installation Guide](https://djaeger.github.io/homeassistant-windows/installation/)
+- [Feature Details](https://djaeger.github.io/homeassistant-windows/features/)
+- [Troubleshooting](https://djaeger.github.io/homeassistant-windows/troubleshooting/)
+- [Development Guide](https://djaeger.github.io/homeassistant-windows/development/)
 
 ---
 
@@ -70,4 +69,8 @@ Contributions are welcome! Please see our [Development Guide](docs/development.m
 
 ## 📜 License
 This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for the full text.
-Copyright © 2026 FaserF.
+
+## 🏆 Credits
+- Without [Home Assistant](https://www.home-assistant.io/), the best smart home platform, this project wouldn’t exist at all.
+- Some aspects of the implementation were inspired by the [Android Companion App](https://github.com/home-assistant/android).
+- Many thanks also to [@FaserF](https://github.com/FaserF), who started developing this app.
