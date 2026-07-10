@@ -1,7 +1,7 @@
 # Home Assistant Windows Companion
 
-[![GitHub Release](https://img.shields.io/github/v/release/FaserF/homeassistant-windows?style=flat-square)](https://github.com/FaserF/homeassistant-windows/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/FaserF/homeassistant-windows/ci.yml?branch=main&style=flat-square)](https://github.com/FaserF/homeassistant-windows/actions/workflows/ci.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/DJaeger/homeassistant-windows?style=flat-square)](https://github.com/DJaeger/homeassistant-windows/releases)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/DJaeger/homeassistant-windows/ci.yml?branch=main&style=flat-square)](https://github.com/DJaeger/homeassistant-windows/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Companion-blue.svg?style=flat-square&logo=home-assistant)](https://www.home-assistant.io/)
 
@@ -45,7 +45,7 @@ Control your Windows environment directly from Home Assistant dashboards and aut
 
 ## 🚀 Quick Start
 
-1. **Download**: Grab the latest `HAWindowsCompanion.zip` from [Releases](https://github.com/fabian-be/homeassistant-windows/releases).
+1. **Download**: Grab the latest `HAWindowsCompanion.zip` from [Releases](https://github.com/DJaeger/homeassistant-windows/releases).
 2. **Extract**: Unzip to a local folder (e.g., `%LOCALAPPDATA%\Programs`).
 3. **Launch**: Open `HAWindowsCompanion.exe`.
 4. **Connect**: Follow the "Setup Wizard" to authorize the app via OAuth2.
@@ -55,7 +55,7 @@ Control your Windows environment directly from Home Assistant dashboards and aut
 
 ## 📖 Documentation
 
-Detailed documentation is available in the `/docs` folder or via our [Online Documentation Site](https://fabian-be.github.io/homeassistant-windows/).
+Detailed documentation is available in the `/docs` folder or via our [Online Documentation Site](https://DJaeger.github.io/homeassistant-windows/).
 
 - [Installation Guide](docs/installation.md)
 - [Feature Details](docs/features.md)
