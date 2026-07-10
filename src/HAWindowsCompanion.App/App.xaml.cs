@@ -40,7 +40,7 @@ public partial class App : Application
                 // Check if file logging is enabled (DI-friendly approach)
                 var tempServices = new ServiceCollection();
                 tempServices.AddSingleton<ISettingsService, SettingsService>();
-                var tempProvider = tempServices.BuildServiceProvider();
+                using var tempProvider = tempServices.BuildServiceProvider();
                 var settingsService = tempProvider.GetRequiredService<ISettingsService>();
 
                 var isFileLoggingEnabled = settingsService.GetAsync<bool>("IsFileLoggingEnabled").GetAwaiter().GetResult();

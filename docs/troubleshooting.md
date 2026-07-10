@@ -36,8 +36,8 @@ File logging is **disabled by default** to save storage space. You can enable it
 
 1. Open **Settings** via the system tray icon
 2. Scroll to the **"Debugging"** section
-3. Enable **"File Logging aktivieren"**
-4. Click **"App neu starten"** to apply the change
+3. Enable **"Enable File Logging"**
+4. Click **"Restart App"** to apply the change
 
 **⚠️ Note:** An application restart is required for file logging to become active.
 
@@ -45,22 +45,22 @@ File logging is **disabled by default** to save storage space. You can enable it
 
 After activation, all logs are automatically saved to:
 
-```
+```text
 %LOCALAPPDATA%\HAWindowsCompanion\logs\
 ```
 
-You can open the folder directly via the **"Log-Ordner öffnen"** button in Settings.
+You can open the folder directly via the **"Open Log Folder"** button in Settings.
 
 ### Log Format
 
 Each log line follows this format:
 
-```
+```text
 [YYYY-MM-DD HH:mm:ss] [LogLevel] Category: Message
 ```
 
 **Example:**
-```
+```log
 [2026-03-15 14:23:45] [Information] HAWindowsCompanion.Infrastructure.Commands.CommandDispatcher: CommandDispatcher service starting...
 [2026-03-15 14:23:46] [Warning] HAWindowsCompanion.Infrastructure.Sensors.SensorManager: Failed to update sensor battery_level
 [2026-03-15 14:23:47] [Error] HAWindowsCompanion.Infrastructure.Api.HomeAssistantApiClient: Connection refused
@@ -85,7 +85,7 @@ When reporting a problem on GitHub, please include the relevant log files:
 
 1. Enable file logging (if not already enabled)
 2. Reproduce the issue
-3. Open the log folder via **"Log-Ordner öffnen"**
+3. Open the log folder via **"Open Log Folder"**
 4. Upload the most recent `app-YYYY-MM-DD.log` file
 
 **Note:** Please check the logs for sensitive information (e.g., passwords, API keys) before sharing them publicly.

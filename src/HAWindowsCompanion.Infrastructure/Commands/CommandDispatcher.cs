@@ -125,7 +125,14 @@ public sealed class CommandDispatcher : BackgroundService
             webhook_id = server.WebhookId,
             support_confirm = false
         };
-        await SendMessageAsync(ws, subscribePushPayload, stoppingToken);
+        if (!string.IsNullOrEmpty(server.WebhookId))
+        {
+            await SendMessageAsync(ws, subscribePushPayload, stoppingToken);
+        }
+        else
+        {
+            _logger.LogWarning("CommandDispatcher: WebhookId is not set; skipping push notification channel subscription.");
+        }
 
         while (ws.State == WebSocketState.Open && !stoppingToken.IsCancellationRequested)
         {

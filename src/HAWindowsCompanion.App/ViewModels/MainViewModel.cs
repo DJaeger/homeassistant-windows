@@ -86,7 +86,7 @@ public partial class MainViewModel : ObservableObject
     {
         if (attributes is null || attributes.Count == 0)
         {
-            return "Keine Attribute verfügbar";
+            return "No attributes available";
         }
 
         var lines = new List<string>();
