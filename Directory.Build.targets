@@ -11,7 +11,7 @@
 
   <!-- Override vulnerable transitive System.Drawing.Common pulled by Microsoft.Toolkit.Uwp.Notifications -->
   <ItemGroup>
-    <PackageReference Include="System.Drawing.Common" Version="8.0.28" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.9" />
   </ItemGroup>
 
 </Project>
