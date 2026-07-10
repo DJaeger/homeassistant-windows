@@ -1,56 +1,158 @@
+---
 name: Release
 
-on:
+"on":
+  workflow_call:
+    inputs:
+      release_type:
+        description: "Type of release (stable, beta, dev)"
+        required: true
+        default: "dev"
+        type: string
+      increment_level:
+        description: "Increment level (major, minor, patch, none)"
+        required: true
+        default: "patch"
+        type: string
+      version_override:
+        description: 'Manual Version Override (e.g. 1.2.3)'
+        required: false
+        type: string
+      re_release:
+        description: 'Re-Release Current Version'
+        required: true
+        default: false
+        type: boolean
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Full version string (e.g. 2026.3.0, 2026.3.1b1, 2026.3.2.dev20260322)'
+      release_type:
+        description: "Type of release (stable, beta, dev)"
         required: true
-        default: '2026.3.0'
+        default: "dev"
+        type: choice
+        options:
+          - stable
+          - beta
+          - dev
+      increment_level:
+        description: "Increment level (major, minor, patch, none)"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+          - none
+      version_override:
+        description: "Target base version (optional, e.g. 3.1.0)"
+        required: false
+        type: string
+      re_release:
+        description: 'Re-Release Current Version'
+        required: true
+        default: false
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-release
+  cancel-in-progress: true
 
 jobs:
-  release:
-    runs-on: windows-latest
+  versioning:
+    name: Determine Version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+      tag: ${{ steps.get_version.outputs.tag }}
+      is_prerelease: ${{ steps.get_version.outputs.is_prerelease }}
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 10.0.x
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          sparse-checkout: |
+            VERSION
+            scripts/generate_changelog.py
+            scripts/calculate_version.py
+          sparse-checkout-cone-mode: false
 
-    - name: Publish App
-      run: |
-        $Version = "${{ github.event.inputs.version }}"
-        $NumericVersion = $Version -replace '\.dev.*$', '' -replace 'b.*$', ''
-        if ($NumericVersion -match '^\d+\.\d+\.\d+$') { $NumericVersion += ".0" }
-        
-        dotnet publish src/HAWindowsCompanion.App/HAWindowsCompanion.App.csproj `
-          -c Release `
-          -r win-x64 `
-          -p:PublishSingleFile=true `
-          -p:SelfContained=true `
-          -p:PublishReadyToRun=true `
-          -p:WindowsPackageType=None `
-          -p:WindowsAppSDKSelfContained=true `
-          -p:WindowsSdkPackageVersion=10.0.22621.52 `
-          -p:AssemblyVersion=$NumericVersion `
-          -p:FileVersion=$NumericVersion `
-          -p:InformationalVersion=$Version `
-          -p:Version=$NumericVersion `
-          --output ./publish
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
 
-    - name: Create Zip
-      run: |
-        Compress-Archive -Path ./publish/* -DestinationPath ./HAWindowsCompanion_v${{ github.event.inputs.version }}.zip
+      - name: Calculate Version
+        id: get_version
+        env:
+          RELEASE_TYPE: ${{ inputs.release_type }}
+          INCREMENT_LEVEL: ${{ inputs.increment_level }}
+          VERSION_OVERRIDE: ${{ inputs.version_override }}
+          RE_RELEASE: ${{ inputs.re_release }}
+          REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/calculate_version.py
 
-    - name: Create Release
-      uses: softprops/action-gh-release@v2
-      with:
-        files: HAWindowsCompanion_v${{ github.event.inputs.version }}.zip
-        tag_name: ${{ github.event.inputs.version }}
-        name: Release ${{ github.event.inputs.version }}
-        prerelease: ${{ contains(github.event.inputs.version, 'b') || contains(github.event.inputs.version, 'dev') }}
-        generate_release_notes: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check Existing Release / Delete Draft
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          RE_RELEASE: ${{ inputs.re_release }}
+        run: |
+          TAG="${{ steps.get_version.outputs.tag }}"
+          if [ "$RE_RELEASE" = "true" ]; then
+            RELEASE_ID=$(gh api "repos/$REPO/releases" --jq ".[] | select(.tag_name==\"$TAG\") | .id")
+            if [ ! -z "$RELEASE_ID" ]; then
+              gh api -X DELETE "repos/$REPO/releases/$RELEASE_ID"
+            fi
+            git push --delete origin "$TAG" || true
+            git tag -d "$TAG" || true
+          fi
+
+      - name: Upload Release Body
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-body
+          path: release_body.md
+
+  build-and-publish:
+    name: Build & Publish Release
+    needs: versioning
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Run Build and Release Package Script
+        run: |
+          python build_release.py --version "${{ needs.versioning.outputs.version }}"
+
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ needs.versioning.outputs.tag }}
+          name: Release ${{ needs.versioning.outputs.version }}
+          body_path: release_body.md
+          prerelease: ${{ needs.versioning.outputs.is_prerelease == 'true' }}
+          draft: false
+          files: |
+            HAWindowsCompanion_v${{ needs.versioning.outputs.version }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
