@@ -49,3 +49,4 @@ public sealed class FileLoggerProvider : ILoggerProvider
             // Fail silently
         }
     }
+}
