@@ -5,7 +5,7 @@ Thank you for your interest in contributing to the Home Assistant Windows Compan
 ## 🛠️ Prerequisites
 
 - **Windows 10/11**: Developing WinUI 3 apps requires a modern Windows environment.
-- **Visual Studio 2022**: With the "Windows app development" workload installed.
+- **Visual Studio 2026**: With the "Windows app development" workload installed.
 - **.NET 10 SDK**: The latest cutting-edge runtime.
 - **Git**: For version control.
 
