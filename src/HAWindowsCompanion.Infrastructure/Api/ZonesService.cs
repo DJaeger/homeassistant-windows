@@ -80,8 +80,9 @@ public sealed class ZonesService : IZonesService
             return _cachedZones;
 
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "ZonesService: Failed to retrieve zones.");
             return null;
         }
     }

@@ -83,21 +83,30 @@ public partial class SetupWizardViewModel : ObservableObject
         string url = instance?.Url ?? CustomInstanceUrl;
         if (string.IsNullOrEmpty(url)) return;
 
-        string manufacturer = "N/A";
-        string model = "N/A";
-
-        ManagementObjectSearcher searcher = new ManagementObjectSearcher($"SELECT * FROM Win32_ComputerSystem");
-        foreach (ManagementObject obj in searcher.Get())
-        {
-            manufacturer = obj["Manufacturer"]?.ToString() ?? "N/A";
-            model = obj["Model"]?.ToString() ?? "N/A";
-        }
-
         IsConnecting = true;
         ErrorMessage = null;
 
+        string manufacturer = "N/A";
+        string model = "N/A";
+
         try
         {
+            // Resolve device manufacturer/model off the UI thread to avoid blocking
+            (manufacturer, model) = await Task.Run(() =>
+            {
+                using var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem");
+                foreach (ManagementObject obj in searcher.Get())
+                {
+                    using (obj)
+                    {
+                        return (
+                            obj["Manufacturer"]?.ToString() ?? "N/A",
+                            obj["Model"]?.ToString() ?? "N/A"
+                        );
+                    }
+                }
+                return ("N/A", "N/A");
+            });
             // 1. Authenticate
             var code = await _authService.AuthorizeAsync(url);
             var tokens = await _authService.ExchangeCodeAsync(url, code);

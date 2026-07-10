@@ -37,15 +37,24 @@ public partial class SettingsViewModel : ObservableObject
 
     private async void LoadSettings()
     {
-        UpdateInterval = await _settingsService.GetAsync<int>("SensorUpdateIntervalSeconds");
-        if (UpdateInterval == 0) UpdateInterval = 60;
-        LaunchAtStartup = _startupManager.IsStartupEnabled;
+        try
+        {
+            UpdateInterval = await _settingsService.GetAsync<int>("SensorUpdateIntervalSeconds");
+            if (UpdateInterval == 0) UpdateInterval = 60;
+            LaunchAtStartup = _startupManager.IsStartupEnabled;
 
-        // Load file logging setting
-        IsFileLoggingEnabled = await _settingsService.GetAsync<bool>("IsFileLoggingEnabled");
+            // Load file logging setting
+            IsFileLoggingEnabled = await _settingsService.GetAsync<bool>("IsFileLoggingEnabled");
 
-        // Restart is not required initially
-        IsRestartRequired = false;
+            // Restart is not required initially
+            IsRestartRequired = false;
+        }
+        catch (Exception ex)
+        {
+            // Apply safe defaults so the settings page remains usable
+            if (UpdateInterval == 0) UpdateInterval = 60;
+            _ = ex; // Exception is swallowed — settings load is best-effort
+        }
     }
 
     partial void OnUpdateIntervalChanged(int value)
