@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using HAWindowsCompanion.Core.Interfaces;
@@ -115,13 +110,22 @@ public sealed class CommandDispatcher : BackgroundService
         // allows HA to send notifications/commands via the cloudhook/webhook.
         // However, for real-time bi-directional local control, we can subscribe to events here.
         
-        var subscribePayload = new 
+        var subscribeEventsPayload = new
         { 
             id = 1, 
             type = "subscribe_events", 
             event_type = "mobile_app_command" 
         };
-        await SendMessageAsync(ws, subscribePayload, stoppingToken);
+        await SendMessageAsync(ws, subscribeEventsPayload, stoppingToken);
+
+        var subscribePushPayload = new
+        {
+            id = 2,
+            type = "mobile_app/push_notification_channel",
+            webhook_id = server.WebhookId,
+            support_confirm = false
+        };
+        await SendMessageAsync(ws, subscribePushPayload, stoppingToken);
 
         while (ws.State == WebSocketState.Open && !stoppingToken.IsCancellationRequested)
         {

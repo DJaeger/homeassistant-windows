@@ -1,13 +1,11 @@
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Management;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using HAWindowsCompanion.Core.Interfaces;
-using HAWindowsCompanion.Core.Models;
 using HAWindowsCompanion.App.Services;
 using HAWindowsCompanion.App.Views;
+using HAWindowsCompanion.Core.Interfaces;
+using HAWindowsCompanion.Core.Models;
 
 namespace HAWindowsCompanion.App.ViewModels;
 
@@ -26,6 +24,9 @@ public partial class SetupWizardViewModel : ObservableObject
     [ObservableProperty] private bool _isConnecting = false;
     [ObservableProperty] private string? _errorMessage;
 
+    // Computed property for Border.IsHitTestVisible binding
+    public bool IsNotConnecting => !IsConnecting;
+
     public ObservableCollection<DiscoveredInstance> DiscoveredInstances { get; } = new();
 
     public SetupWizardViewModel(
@@ -42,6 +43,12 @@ public partial class SetupWizardViewModel : ObservableObject
         _credentialStore = credentialStore;
         _settingsService = settingsService;
         _navigationService = navigationService;
+    }
+
+    // Notify IsNotConnecting when IsConnecting changes
+    partial void OnIsConnectingChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsNotConnecting));
     }
 
     [RelayCommand]
@@ -76,6 +83,16 @@ public partial class SetupWizardViewModel : ObservableObject
         string url = instance?.Url ?? CustomInstanceUrl;
         if (string.IsNullOrEmpty(url)) return;
 
+        string manufacturer = "N/A";
+        string model = "N/A";
+
+        ManagementObjectSearcher searcher = new ManagementObjectSearcher($"SELECT * FROM Win32_ComputerSystem");
+        foreach (ManagementObject obj in searcher.Get())
+        {
+            manufacturer = obj["Manufacturer"]?.ToString() ?? "N/A";
+            model = obj["Model"]?.ToString() ?? "N/A";
+        }
+
         IsConnecting = true;
         ErrorMessage = null;
 
@@ -93,14 +110,17 @@ public partial class SetupWizardViewModel : ObservableObject
                     .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
                     .Cast<System.Reflection.AssemblyInformationalVersionAttribute>()
                     .FirstOrDefault()?.InformationalVersion ?? "2026.3.0",
-                DeviceName = Environment.MachineName,
-                Manufacturer = "FaserF",
-                Model = "Windows PC",
-                OsVersion = Environment.OSVersion.VersionString
+                DeviceName = System.Net.Dns.GetHostName(),
+                Manufacturer = manufacturer,
+                Model = model,
+                OsVersion = Environment.OSVersion.VersionString,
+                AppData = new Dictionary<string, object>() {
+                    ["push_websocket_channel"] = true
+                }
             };
 
             var serverInfo = await _haClient.RegisterDeviceAsync(url, tokens.AccessToken, registration);
-            
+
             // 3. Persist everything
             await _credentialStore.SaveTokenAsync(tokens);
             await _credentialStore.SaveServerInfoAsync(serverInfo);
@@ -108,6 +128,7 @@ public partial class SetupWizardViewModel : ObservableObject
             await _settingsService.SetAsync("SensorUpdateIntervalSeconds", 60);
 
             // 4. Move to success/main
+            _navigationService.ClearBackStack();
             _navigationService.Navigate(typeof(MainPage));
         }
         catch (Exception ex)

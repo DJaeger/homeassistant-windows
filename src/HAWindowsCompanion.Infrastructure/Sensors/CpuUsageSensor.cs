@@ -17,7 +17,7 @@ public sealed class CpuUsageSensor : ISensorProvider
 
     public CpuUsageSensor()
     {
-        _cpuCounter = new PerformanceCounter("Processor Information", "% Processor Utility", "_Total");
+        _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
         // First read always returns 0, so prime it
         _cpuCounter.NextValue();
     }

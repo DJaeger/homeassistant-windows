@@ -1,7 +1,6 @@
-using System;
-using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using HAWindowsCompanion.App.Services;
 using HAWindowsCompanion.App.ViewModels;
@@ -11,6 +10,7 @@ using HAWindowsCompanion.Infrastructure.Api;
 using HAWindowsCompanion.Infrastructure.Authentication;
 using HAWindowsCompanion.Infrastructure.Commands;
 using HAWindowsCompanion.Infrastructure.Discovery;
+using HAWindowsCompanion.Infrastructure.Logging;
 using HAWindowsCompanion.Infrastructure.Platform;
 using HAWindowsCompanion.Infrastructure.Sensors;
 
@@ -27,6 +27,7 @@ public partial class App : Application
     private static readonly Mutex _singleInstanceMutex = new(true, "HAWindowsCompanion_SingleInstance");
 
     public static IServiceProvider Services => ((App)Current)._host.Services;
+    public static MainWindow? MainWindow => ((App)Current)._window as MainWindow;
 
     public App()
     {
@@ -34,6 +35,29 @@ public partial class App : Application
         InitializeComponent();
 
         _host = Host.CreateDefaultBuilder()
+            .ConfigureLogging((context, logging) =>
+            {
+                // Check if file logging is enabled (DI-friendly approach)
+                var tempServices = new ServiceCollection();
+                tempServices.AddSingleton<ISettingsService, SettingsService>();
+                var tempProvider = tempServices.BuildServiceProvider();
+                var settingsService = tempProvider.GetRequiredService<ISettingsService>();
+
+                var isFileLoggingEnabled = settingsService.GetAsync<bool>("IsFileLoggingEnabled").GetAwaiter().GetResult();
+
+                if (isFileLoggingEnabled)
+                {
+                    var options = new FileLoggerOptions();
+                    logging.AddProvider(new FileLoggerProvider(options));
+                }
+
+                // Increase log level for debug builds
+#if DEBUG
+                logging.SetMinimumLevel(LogLevel.Debug);
+#else
+                logging.SetMinimumLevel(LogLevel.Information);
+#endif
+            })
             .ConfigureServices((context, services) =>
             {
                 // Platform services
@@ -49,6 +73,7 @@ public partial class App : Application
 
                 // HA API client
                 services.AddSingleton<IHomeAssistantClient, HomeAssistantApiClient>();
+                services.AddSingleton<IZonesService, ZonesService>();
                 services.AddHttpClient();
 
                 // Sensors — register all providers
@@ -59,8 +84,9 @@ public partial class App : Application
                 services.AddSingleton<ISensorProvider, SystemIdleTimeSensor>();
                 services.AddSingleton<ISensorProvider, AudioOutputDeviceSensor>();
                 services.AddSingleton<ISensorProvider, NetworkSsidSensor>();
-                services.AddSingleton<ISensorProvider, LocationSensor>();
-                services.AddSingleton<SensorManager>();
+                services.AddHostedService<SensorManager>();
+                services.AddSingleton<LocationTrackerService>();
+                services.AddHostedService(provider => provider.GetRequiredService<LocationTrackerService>());
 
                 // Notification Service
                 services.AddSingleton<INotificationService, ToastNotificationService>();
@@ -70,15 +96,26 @@ public partial class App : Application
                 services.AddSingleton<ICommandHandler, LockSessionCommandHandler>();
                 services.AddSingleton<ICommandHandler, ShutdownCommandHandler>();
                 services.AddSingleton<ICommandHandler, MediaPlayPauseCommandHandler>();
-                services.AddSingleton<CommandDispatcher>();
+                services.AddHostedService<CommandDispatcher>();
 
                 // ViewModels
                 services.AddTransient<SetupWizardViewModel>();
                 services.AddTransient<SettingsViewModel>();
                 services.AddTransient<MainViewModel>();
 
+                // Views
+                services.AddTransient<MainPage>();
+                services.AddTransient<SettingsPage>();
+                services.AddTransient<SetupWizardPage>();
+
                 // Navigation
                 services.AddSingleton<NavigationService>();
+
+                // MainWindow
+                services.AddSingleton<MainWindow>();
+
+                // Register MainWindow Commands Interface
+                services.AddSingleton<IMainWindowCommands>(sp => sp.GetRequiredService<MainWindow>());
             })
             .Build();
     }
@@ -95,18 +132,21 @@ public partial class App : Application
 
         await _host.StartAsync();
 
-        _window = new MainWindow();
+        _window = Services.GetRequiredService<MainWindow>();
 
         var settings = Services.GetRequiredService<ISettingsService>();
         var isConfigured = await settings.GetAsync<bool>("IsConfigured");
+        var navigationService = Services.GetRequiredService<NavigationService>();
 
         if (!isConfigured)
         {
             // Show setup wizard on first run
-            if (_window.Content is Microsoft.UI.Xaml.Controls.Frame frame)
-            {
-                frame.Navigate(typeof(SetupWizardPage));
-            }
+            navigationService.Navigate(typeof(SetupWizardPage));
+        }
+        else
+        {
+            // Show main page if already configured
+            navigationService.Navigate(typeof(MainPage));
         }
 
         _window.Activate();

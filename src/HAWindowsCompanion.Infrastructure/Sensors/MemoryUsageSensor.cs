@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using HAWindowsCompanion.Core.Interfaces;
 using HAWindowsCompanion.Core.Models;
 
@@ -34,34 +35,50 @@ public sealed class MemoryUsageSensor : ISensorProvider
         Attributes = GetAttributes()
     };
 
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    private struct MEMORYSTATUSEX
+    {
+        public uint dwLength;
+        public uint dwMemoryLoad;
+        public ulong ullTotalPhys;
+        public ulong ullAvailPhys;
+        public ulong ullTotalPageFile;
+        public ulong ullAvailPageFile;
+        public ulong ullTotalVirtual;
+        public ulong ullAvailVirtual;
+        public ulong ullAvailExtendedVirtual;
+    }
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GlobalMemoryStatusEx([In, Out] ref MEMORYSTATUSEX lpBuffer);
+
     private static double GetMemoryUsage()
     {
-        var info = GC.GetGCMemoryInfo();
-        var totalMemory = info.TotalAvailableMemoryBytes;
-        var usedMemory = totalMemory - info.HighMemoryLoadThresholdBytes;
-
-        // Use performance counter for accurate system-wide memory
-        try
+        var memStatus = new MEMORYSTATUSEX { dwLength = (uint)Marshal.SizeOf<MEMORYSTATUSEX>() };
+        if (GlobalMemoryStatusEx(ref memStatus))
         {
-            using var counter = new PerformanceCounter("Memory", "% Committed Bytes In Use");
-            return Math.Round(counter.NextValue(), 1);
+            return Math.Round((double)memStatus.dwMemoryLoad, 1);
         }
-        catch
-        {
-            // Fallback: estimate from GC info
-            var process = Process.GetCurrentProcess();
-            return totalMemory > 0
-                ? Math.Round((1.0 - (double)info.HighMemoryLoadThresholdBytes / totalMemory) * 100, 1)
-                : 0;
-        }
+        return 0;
     }
 
     private static Dictionary<string, object> GetAttributes()
     {
-        var info = GC.GetGCMemoryInfo();
-        return new Dictionary<string, object>
+        var memStatus = new MEMORYSTATUSEX { dwLength = (uint)Marshal.SizeOf<MEMORYSTATUSEX>() };
+        if (GlobalMemoryStatusEx(ref memStatus))
         {
-            ["total_memory_gb"] = Math.Round(info.TotalAvailableMemoryBytes / 1073741824.0, 2)
-        };
+            return new Dictionary<string, object>
+            {
+                ["total_memory_bytes"] = memStatus.ullTotalPhys,
+                ["available_memory_bytes"] = memStatus.ullAvailPhys,
+                ["total_page_file_bytes"] = memStatus.ullTotalPageFile,
+                ["available_page_file_bytes"] = memStatus.ullAvailPageFile,
+                ["total_virtual_bytes"] = memStatus.ullTotalVirtual,
+                ["available_virtual_bytes"] = memStatus.ullAvailVirtual,
+                ["available_extended_virtual_bytes"] = memStatus.ullAvailExtendedVirtual
+            };
+        }
+        return new Dictionary<string, object>();
     }
 }

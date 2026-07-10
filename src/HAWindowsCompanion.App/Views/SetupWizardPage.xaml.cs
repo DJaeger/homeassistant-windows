@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 using HAWindowsCompanion.App.ViewModels;
 
@@ -8,9 +7,9 @@ public sealed partial class SetupWizardPage : Page
 {
     public SetupWizardViewModel ViewModel { get; }
 
-    public SetupWizardPage()
+    public SetupWizardPage(SetupWizardViewModel viewModel)
     {
+        ViewModel = viewModel;
         InitializeComponent();
-        ViewModel = App.Services.GetRequiredService<SetupWizardViewModel>();
     }
 }

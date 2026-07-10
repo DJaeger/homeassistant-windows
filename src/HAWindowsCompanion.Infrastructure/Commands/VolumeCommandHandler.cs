@@ -1,7 +1,5 @@
-using System;
 using System.Runtime.InteropServices;
 using System.Text.Json;
-using System.Threading.Tasks;
 using NAudio.CoreAudioApi;
 using HAWindowsCompanion.Core.Interfaces;
 

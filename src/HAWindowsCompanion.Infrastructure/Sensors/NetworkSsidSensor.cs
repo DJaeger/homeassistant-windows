@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Net.NetworkInformation;
 using HAWindowsCompanion.Core.Interfaces;
 using HAWindowsCompanion.Core.Models;

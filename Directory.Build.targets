@@ -1,0 +1,11 @@
+<Project>
+  <Target Name="ValidateMsvcTools" BeforeTargets="PrepareForBuild">
+	<PropertyGroup>
+	  <_MsvcToolsDir>$(VsInstallRoot)\VC\Tools\MSVC</_MsvcToolsDir>
+	</PropertyGroup>
+
+	<Error
+	  Condition="'$(UseWinUI)' == 'true' and '$(VsInstallRoot)' != '' and !Exists('$(_MsvcToolsDir)')"
+	  Text="MSVC Build Tools are missing. In Visual Studio, open Extras > Get Tools and Features... and install/modify the Desktop development with C++ workload. Then rebuild." />
+  </Target>
+</Project>
