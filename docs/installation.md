@@ -6,7 +6,7 @@ Setting up the Home Assistant Windows Companion is straightforward. Follow these
 
 The application is distributed as a self-contained, single-file executable packaged in a `.zip` archive. No installer is required, making it easy to run and portable.
 
-1. Go to the [Releases](https://github.com/fabian-be/homeassistant-windows/releases) page.
+1. Go to the [Releases](https://github.com/DJaeger/homeassistant-windows/releases) page.
 2. Download the latest `HAWindowsCompanion.zip`.
 3. Extract the contents to a permanent location on your PC (e.g., `C:\Program Files\HAWindowsCompanion` or `%LOCALAPPDATA%\Programs\HAWindowsCompanion`).
 4. Double-click `HAWindowsCompanion.exe` to launch.
