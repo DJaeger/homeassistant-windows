@@ -77,6 +77,14 @@ public partial class SetupWizardViewModel(
             model = obj["Model"]?.ToString() ?? "N/A";
         }
 
+        // If DeviceId is not set, generate a new one and save it
+        string? DeviceId = await _settingsService.GetAsync<string>("DeviceId");
+        if (DeviceId == null)
+        {
+            DeviceId = Guid.NewGuid().ToString();
+            await _settingsService.SetAsync("DeviceId", DeviceId);
+        }
+
         IsConnecting = true;
         ErrorMessage = null;
 
@@ -89,7 +97,7 @@ public partial class SetupWizardViewModel(
             // 2. Register Device
             var registration = new DeviceRegistration
             {
-                DeviceId = Guid.NewGuid().ToString(),
+                DeviceId = DeviceId,
                 AppVersion = System.Reflection.Assembly.GetExecutingAssembly()
                     .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
                     .Cast<System.Reflection.AssemblyInformationalVersionAttribute>()
