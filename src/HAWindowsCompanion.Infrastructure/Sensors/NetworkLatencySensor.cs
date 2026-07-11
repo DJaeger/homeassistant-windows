@@ -8,20 +8,14 @@ namespace HAWindowsCompanion.Infrastructure.Sensors;
 /// <summary>
 /// Reports network latency (ping round-trip time) to the Home Assistant instance.
 /// </summary>
-public sealed class NetworkLatencySensor : ISensorProvider
+public sealed class NetworkLatencySensor(
+    ICredentialStore _credentialStore,
+    ILogger<NetworkLatencySensor> _logger
+) : ISensorProvider
 {
-    private readonly ICredentialStore _credentialStore;
-    private readonly ILogger<NetworkLatencySensor> _logger;
-
     public string UniqueId => "network_latency";
     public string Name => "Network Latency";
     public bool IsEnabled { get; set; } = true;
-
-    public NetworkLatencySensor(ICredentialStore credentialStore, ILogger<NetworkLatencySensor> logger)
-    {
-        _credentialStore = credentialStore;
-        _logger = logger;
-    }
 
     public SensorRegistration GetRegistration() => new()
     {

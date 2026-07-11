@@ -9,15 +9,15 @@ using HAWindowsCompanion.Core.Models;
 
 namespace HAWindowsCompanion.App.ViewModels;
 
-public partial class SetupWizardViewModel : ObservableObject
+public partial class SetupWizardViewModel(
+        IDiscoveryService _discoveryService,
+        IAuthenticationService _authService,
+        IHomeAssistantClient _haClient,
+        ICredentialStore _credentialStore,
+        ISettingsService _settingsService,
+        NavigationService _navigationService
+) : ObservableObject
 {
-    private readonly IDiscoveryService _discoveryService;
-    private readonly IAuthenticationService _authService;
-    private readonly IHomeAssistantClient _haClient;
-    private readonly ICredentialStore _credentialStore;
-    private readonly ISettingsService _settingsService;
-    private readonly NavigationService _navigationService;
-
     [ObservableProperty] private int _currentStep = 0;
     [ObservableProperty] private bool _isScanning = false;
     [ObservableProperty] private string _customInstanceUrl = "";
@@ -28,22 +28,6 @@ public partial class SetupWizardViewModel : ObservableObject
     public bool IsNotConnecting => !IsConnecting;
 
     public ObservableCollection<DiscoveredInstance> DiscoveredInstances { get; } = new();
-
-    public SetupWizardViewModel(
-        IDiscoveryService discoveryService,
-        IAuthenticationService authService,
-        IHomeAssistantClient haClient,
-        ICredentialStore credentialStore,
-        ISettingsService settingsService,
-        NavigationService navigationService)
-    {
-        _discoveryService = discoveryService;
-        _authService = authService;
-        _haClient = haClient;
-        _credentialStore = credentialStore;
-        _settingsService = settingsService;
-        _navigationService = navigationService;
-    }
 
     // Notify IsNotConnecting when IsConnecting changes
     partial void OnIsConnectingChanged(bool value)

@@ -11,31 +11,21 @@ namespace HAWindowsCompanion.Infrastructure.Authentication;
 /// Implements Home Assistant OAuth2 authentication flow.
 /// Opens a local loopback HTTP listener to capture the auth callback.
 /// </summary>
-public sealed class OAuth2AuthenticationService : IAuthenticationService
+public sealed class OAuth2AuthenticationService(
+        IHttpClientFactory _httpClientFactory,
+        ICredentialStore _credentialStore,
+        ILogger<OAuth2AuthenticationService> _logger
+): IAuthenticationService
 {
     private const string RedirectPath = "/auth/callback";
     private const int CallbackPort = 18123;
     private const string CallbackHost = "localhost";
-
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ICredentialStore _credentialStore;
-    private readonly ILogger<OAuth2AuthenticationService> _logger;
 
     // client_id must be the same host:port as redirect_uri
     private readonly string _clientId = $"http://{CallbackHost}:{CallbackPort}";
 
     private TokenInfo? _currentToken;
     private string? _instanceUrl;
-
-    public OAuth2AuthenticationService(
-        IHttpClientFactory httpClientFactory,
-        ICredentialStore credentialStore,
-        ILogger<OAuth2AuthenticationService> logger)
-    {
-        _httpClientFactory = httpClientFactory;
-        _credentialStore = credentialStore;
-        _logger = logger;
-    }
 
     public async Task<string> AuthorizeAsync(string instanceUrl)
     {

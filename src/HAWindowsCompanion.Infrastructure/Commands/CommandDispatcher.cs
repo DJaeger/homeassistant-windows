@@ -12,30 +12,15 @@ namespace HAWindowsCompanion.Infrastructure.Commands;
 /// Connects to Home Assistant via WebSockets to receive and dispatch commands.
 /// Also handles the initial authentication handshake for the WebSocket connection.
 /// </summary>
-public sealed class CommandDispatcher : BackgroundService
+public sealed class CommandDispatcher(
+        IEnumerable<ICommandHandler> _handlers,
+        IAuthenticationService _authService,
+        ICredentialStore _credentialStore,
+        ISettingsService _settingsService,
+        INotificationService _notificationService,
+        ILogger<CommandDispatcher> _logger
+): BackgroundService
 {
-    private readonly IEnumerable<ICommandHandler> _handlers;
-    private readonly IAuthenticationService _authService;
-    private readonly ICredentialStore _credentialStore;
-    private readonly ISettingsService _settingsService;
-    private readonly INotificationService _notificationService;
-    private readonly ILogger<CommandDispatcher> _logger;
-
-    public CommandDispatcher(
-        IEnumerable<ICommandHandler> handlers,
-        IAuthenticationService authService,
-        ICredentialStore credentialStore,
-        ISettingsService settingsService,
-        INotificationService notificationService,
-        ILogger<CommandDispatcher> logger)
-    {
-        _handlers = handlers;
-        _authService = authService;
-        _credentialStore = credentialStore;
-        _settingsService = settingsService;
-        _notificationService = notificationService;
-        _logger = logger;
-    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {

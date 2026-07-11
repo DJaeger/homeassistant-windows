@@ -9,18 +9,14 @@ namespace HAWindowsCompanion.App.Services;
 /// Navigation service to allow ViewModels to trigger page changes with transitions and error handling.
 /// Resolves pages from the dependency injection container to support constructor injection.
 /// </summary>
-public sealed class NavigationService
+public sealed class NavigationService(
+    IServiceProvider _serviceProvider
+)
 {
     private Frame? _frame;
-    private readonly IServiceProvider _serviceProvider;
 
     public event EventHandler<Type>? Navigated;
     public event EventHandler<string>? NavigationFailed;
-
-    public NavigationService(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
 
     public void Initialize(Frame frame)
     {

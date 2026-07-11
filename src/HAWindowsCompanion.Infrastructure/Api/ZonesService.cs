@@ -6,26 +6,16 @@ using Microsoft.Extensions.Logging;
 
 namespace HAWindowsCompanion.Infrastructure.Api;
 
-public sealed class ZonesService : IZonesService
+public sealed class ZonesService (
+        IHomeAssistantClient _haClient,
+        ICredentialStore _credentialStore,
+        ILogger<ZonesService> _logger
+) : IZonesService
 {
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
 
-    private readonly IHomeAssistantClient _haClient;
-    private readonly ICredentialStore _credentialStore;
-    private readonly ILogger<ZonesService> _logger;
-
     private List<Zone> _cachedZones = [];
     private DateTimeOffset _cachedAt = DateTimeOffset.MinValue;
-
-    public ZonesService(
-        IHomeAssistantClient haClient,
-        ICredentialStore credentialStore,
-        ILogger<ZonesService> logger)
-    {
-        _haClient = haClient;
-        _credentialStore = credentialStore;
-        _logger = logger;
-    }
 
     public async Task<List<Zone>?> GetZonesAsync()
     {

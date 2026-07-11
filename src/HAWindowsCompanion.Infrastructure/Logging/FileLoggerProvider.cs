@@ -4,15 +4,11 @@ using System.Collections.Concurrent;
 namespace HAWindowsCompanion.Infrastructure.Logging;
 
 [ProviderAlias("File")]
-public sealed class FileLoggerProvider : ILoggerProvider
+public sealed class FileLoggerProvider(
+    FileLoggerOptions _options
+) : ILoggerProvider
 {
-    private readonly FileLoggerOptions _options;
     private readonly ConcurrentDictionary<string, FileLogger> _loggers = new();
-
-    public FileLoggerProvider(FileLoggerOptions options)
-    {
-        _options = options;
-    }
 
     public ILogger CreateLogger(string categoryName)
     {

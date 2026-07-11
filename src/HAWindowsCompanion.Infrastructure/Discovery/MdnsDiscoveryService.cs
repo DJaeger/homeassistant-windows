@@ -9,15 +9,11 @@ namespace HAWindowsCompanion.Infrastructure.Discovery;
 /// Discovers Home Assistant instances on the local network via mDNS/Zeroconf.
 /// Searches for the _home-assistant._tcp.local. service type.
 /// </summary>
-public sealed class MdnsDiscoveryService : IDiscoveryService
+public sealed class MdnsDiscoveryService(
+    ILogger<MdnsDiscoveryService> _logger
+) : IDiscoveryService
 {
     private const string ServiceType = "_home-assistant._tcp.local.";
-    private readonly ILogger<MdnsDiscoveryService> _logger;
-
-    public MdnsDiscoveryService(ILogger<MdnsDiscoveryService> logger)
-    {
-        _logger = logger;
-    }
 
     public async Task<IReadOnlyList<DiscoveredInstance>> DiscoverInstancesAsync(
         TimeSpan timeout,

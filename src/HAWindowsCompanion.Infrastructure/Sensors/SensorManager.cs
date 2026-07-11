@@ -9,29 +9,15 @@ namespace HAWindowsCompanion.Infrastructure.Sensors;
 /// Orchestrates all registered ISensorProvider instances.
 /// Handles initial registration with Home Assistant and periodic state updates.
 /// </summary>
-public sealed class SensorManager : BackgroundService
+public sealed class SensorManager(
+        IEnumerable<ISensorProvider> _sensors,
+        IHomeAssistantClient _haClient,
+        ICredentialStore _credentialStore,
+        ISettingsService _settingsService,
+        ILogger<SensorManager> _logger
+) : BackgroundService
 {
-    private readonly IEnumerable<ISensorProvider> _sensors;
-    private readonly IHomeAssistantClient _haClient;
-    private readonly ICredentialStore _credentialStore;
-    private readonly ISettingsService _settingsService;
-    private readonly ILogger<SensorManager> _logger;
-
     private static readonly TimeSpan DefaultUpdateInterval = TimeSpan.FromSeconds(60);
-
-    public SensorManager(
-        IEnumerable<ISensorProvider> sensors,
-        IHomeAssistantClient haClient,
-        ICredentialStore credentialStore,
-        ISettingsService settingsService,
-        ILogger<SensorManager> logger)
-    {
-        _sensors = sensors;
-        _haClient = haClient;
-        _credentialStore = credentialStore;
-        _settingsService = settingsService;
-        _logger = logger;
-    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
