@@ -51,11 +51,14 @@ public partial class MainViewModel : ObservableObject
 
             foreach (var sensor in _sensors)
             {
-                ActiveSensors.Add(new SensorInfo 
-                { 
-                    Name = sensor.Name, 
-                    Value = sensor.GetCurrentState().State?.ToString() ?? "N/A" 
-                });
+                if (sensor.IsEnabled)
+                {
+                    ActiveSensors.Add(new SensorInfo 
+                    { 
+                        Name = sensor.Name, 
+                        Value = sensor.GetCurrentState().State?.ToString() ?? "N/A" 
+                    });
+                }
             }
 
             var trackerSnapshot = _locationTrackerService.CurrentStatus;
