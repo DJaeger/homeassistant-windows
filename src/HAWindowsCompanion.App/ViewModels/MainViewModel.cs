@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HAWindowsCompanion.App.Services;
@@ -14,6 +15,7 @@ public partial class MainViewModel : ObservableObject
     private readonly ICredentialStore _credentialStore;
     private readonly LocationTrackerService _locationTrackerService;
     private readonly NavigationService _navigationService;
+    private readonly IMainWindowCommands _mainWindowCommands;
 
     [ObservableProperty] private string _connectionStatus = "Disconnected";
     [ObservableProperty] private string _serverUrl = "Not configured";
@@ -24,18 +26,22 @@ public partial class MainViewModel : ObservableObject
         IEnumerable<ISensorProvider> sensors,
         ICredentialStore credentialStore,
         LocationTrackerService locationTrackerService,
-        NavigationService navigationService)
+        NavigationService navigationService,
+        IMainWindowCommands mainWindowCommands)
     {
         _sensors = sensors;
         _credentialStore = credentialStore;
         _locationTrackerService = locationTrackerService;
         _navigationService = navigationService;
+        _mainWindowCommands = mainWindowCommands;
 
         _ = LoadStatusAsync(); // Intentionally not awaited because asynchronous work cannot be awaited in the constructor.
     }
 
     [RelayCommand]
     private void OpenSettings() => _navigationService.Navigate(typeof(SettingsPage));
+    public ICommand QuitApplicationCommand => _mainWindowCommands.QuitCommand;
+
 
     private async Task LoadStatusAsync()
     {
