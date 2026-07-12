@@ -17,8 +17,8 @@ public partial class MainViewModel : ObservableObject
     private readonly NavigationService _navigationService;
     private readonly IMainWindowCommands _mainWindowCommands;
 
-    [ObservableProperty] private string _connectionStatus = "Disconnected";
-    [ObservableProperty] private string _serverUrl = "Not configured";
+    [ObservableProperty] public partial string ConnectionStatus { get; set; } = "Disconnected";
+    [ObservableProperty] public partial string ServerUrl { get; set; } = "Not configured";
 
     public ObservableCollection<SensorInfo> ActiveSensors { get; } = new();
 

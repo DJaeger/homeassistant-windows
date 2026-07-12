@@ -7,6 +7,7 @@ Encountering issues? Follow this guide to resolve common problems with the Windo
 ### Instance Not Discovered
 - **mDNS/Zeroconf**: Ensure the `zeroconf` integration is enabled in your `configuration.yaml` (it is enabled by default in `default_config:`).
 - **Subnets**: mDNS often doesn't cross between different VLANs or subnets without an mDNS reflector/repeater.
+- **Multiple Interfaces**: By default, Home Assistant only supports mDNS on the primary interface and, consequently, only on the primary network
 - **Manual Entry**: If discovery fails, you can always enter your URL manually in the format `http://192.168.1.x:8123`.
 
 ### "Connection Refused" or Timeouts

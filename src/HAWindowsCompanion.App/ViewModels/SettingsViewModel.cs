@@ -15,10 +15,10 @@ public partial class SettingsViewModel : ObservableObject
     private readonly NavigationService _navigationService;
     private readonly ICommand _restartCommand;
 
-    [ObservableProperty] private int _updateInterval = 60;
-    [ObservableProperty] private bool _launchAtStartup;
-    [ObservableProperty] private bool _isFileLoggingEnabled;
-    [ObservableProperty] private bool _isRestartRequired;
+    [ObservableProperty] public partial int UpdateInterval { get; set; } = 60;
+    [ObservableProperty] public partial bool LaunchAtStartup { get; set; }
+    [ObservableProperty] public partial bool IsFileLoggingEnabled { get; set; }
+    [ObservableProperty] public partial bool IsRestartRequired { get; set; }
 
     public SettingsViewModel(
         ISettingsService settingsService, 
