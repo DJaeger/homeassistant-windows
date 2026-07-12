@@ -16,6 +16,7 @@
     <Company>FaserF</Company>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	<WindowsSdkPackageVersion>10.0.22621.56</WindowsSdkPackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
