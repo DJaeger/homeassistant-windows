@@ -35,7 +35,7 @@ jobs:
           keep_minimum_runs: 5
 
       - name: Remove old artifacts
-        uses: c-hive/gha-remove-artifacts@v1
+        uses: KarbitsCode/gha-remove-artifacts@v2
         with:
           age: '1 month'
           skip-recent: 5
