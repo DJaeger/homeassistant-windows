@@ -36,8 +36,8 @@ File logging is **disabled by default** to save storage space. You can enable it
 
 1. Open **Settings** via the system tray icon
 2. Scroll to the **"Debugging"** section
-3. Enable **"File Logging aktivieren"**
-4. Click **"App neu starten"** to apply the change
+3. Enable **"Enable File Logging"**
+4. Click **"Restart App"** to apply the change
 
 **⚠️ Note:** An application restart is required for file logging to become active.
 
@@ -49,7 +49,7 @@ After activation, all logs are automatically saved to:
 %LOCALAPPDATA%\HAWindowsCompanion\logs\
 ```
 
-You can open the folder directly via the **"Log-Ordner öffnen"** button in Settings.
+You can open the folder directly via the **"Open Log-Folder"** button in Settings.
 
 ### Log Format
 
@@ -85,7 +85,7 @@ When reporting a problem on GitHub, please include the relevant log files:
 
 1. Enable file logging (if not already enabled)
 2. Reproduce the issue
-3. Open the log folder via **"Log-Ordner öffnen"**
+3. Open the log folder via **"Open Log-Folder"**
 4. Upload the most recent `app-YYYY-MM-DD.log` file
 
 **Note:** Please check the logs for sensitive information (e.g., passwords, API keys) before sharing them publicly.
