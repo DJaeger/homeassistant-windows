@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.Input;
 using HAWindowsCompanion.App.Services;
 using HAWindowsCompanion.App.Views;
 using HAWindowsCompanion.Core.Interfaces;
-using HAWindowsCompanion.Core.Models;
 using HAWindowsCompanion.Infrastructure.Sensors;
 
 namespace HAWindowsCompanion.App.ViewModels;

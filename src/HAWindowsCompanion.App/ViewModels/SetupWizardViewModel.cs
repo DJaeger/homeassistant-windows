@@ -67,9 +67,9 @@ public partial class SetupWizardViewModel(
         string url = instance?.Url ?? CustomInstanceUrl;
         if (string.IsNullOrEmpty(url)) return;
 
+        // Get manufacturer and model using WMI
         string manufacturer = "N/A";
         string model = "N/A";
-
         ManagementObjectSearcher searcher = new ManagementObjectSearcher($"SELECT * FROM Win32_ComputerSystem");
         foreach (ManagementObject obj in searcher.Get())
         {
