@@ -9,20 +9,45 @@ using HAWindowsCompanion.Core.Models;
 
 namespace HAWindowsCompanion.App.ViewModels;
 
-public partial class SetupWizardViewModel(
-        IDiscoveryService _discoveryService,
-        IAuthenticationService _authService,
-        IHomeAssistantClient _haClient,
-        ICredentialStore _credentialStore,
-        ISettingsService _settingsService,
-        NavigationService _navigationService
-) : ObservableObject
+public partial class SetupWizardViewModel : ObservableObject
 {
+    private readonly IDiscoveryService _discoveryService;
+    private readonly IAuthenticationService _authService;
+    private readonly IHomeAssistantClient _haClient;
+    private readonly ICredentialStore _credentialStore;
+    private readonly ISettingsService _settingsService;
+    private readonly NavigationService _navigationService;
+
     [ObservableProperty] private int _currentStep = 0;
     [ObservableProperty] private bool _isScanning = false;
     [ObservableProperty] private string _customInstanceUrl = "";
     [ObservableProperty] private bool _isConnecting = false;
     [ObservableProperty] private string? _errorMessage;
+    [ObservableProperty] private bool _isConfigured = false;
+
+    public SetupWizardViewModel(
+        IDiscoveryService discoveryService,
+        IAuthenticationService authService,
+        IHomeAssistantClient haClient,
+        ICredentialStore credentialStore,
+        ISettingsService settingsService,
+        NavigationService navigationService
+    )
+    {
+        _discoveryService = discoveryService;
+        _authService = authService;
+        _haClient = haClient;
+        _credentialStore = credentialStore;
+        _settingsService = settingsService;
+        _navigationService = navigationService;
+        LoadSettings();
+    }
+
+    private async void LoadSettings()
+    {
+        IsConfigured = await _settingsService.GetAsync<bool>("IsConfigured");
+    }
+
 
     // Computed property for Border.IsHitTestVisible binding
     public bool IsNotConnecting => !IsConnecting;
@@ -132,4 +157,11 @@ public partial class SetupWizardViewModel(
             IsConnecting = false;
         }
     }
+
+    [RelayCommand]
+    private void NavigateToSettings()
+    {
+        _navigationService.Navigate(typeof(SettingsPage));
+    }
+
 }

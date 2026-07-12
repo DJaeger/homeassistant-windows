@@ -23,8 +23,8 @@
                 Margin="0 4 0 0"
                 Background="Transparent"
                 BorderBrush="Transparent"
-                ToolTipService.ToolTip="Zurück zur Hauptansicht"
-                AutomationProperties.Name="Zurück">
+                ToolTipService.ToolTip="Back to main page"
+                AutomationProperties.Name="back">
                 <SymbolIcon Symbol="Back" />
             </Button>
 
@@ -90,7 +90,79 @@
                         Content="Open Log Folder"
                         Command="{x:Bind ViewModel.OpenLogFolderCommand}"
                         Margin="0,8,0,0"
+                        BorderBrush="{ThemeResource TextFillColorSecondaryBrush}"
                         AutomationProperties.Name="Open log folder in Explorer" />
+                </StackPanel>
+
+                <StackPanel Spacing="8">
+                    <TextBlock
+                        Text="Danger Zone"
+                        Style="{StaticResource SubtitleTextBlockStyle}" />
+
+                    <TextBlock
+                    Text="Reconnect"
+                    Margin="4 0 0 0"
+                    Style="{StaticResource BodyLargeStrongTextBlockStyle}" />
+
+                    <StackPanel
+                        Margin="8 0 0 0">
+
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            Margin="0,4,0,0">
+                            <Run Text="This will launch the setup wizard to reconnect the app to Home Assistant." />
+                        </TextBlock>
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            Margin="0,4,0,0">
+                            <Run Text="The device ID remains unchanged, so Home Assistant will recognise the app as the same device if it was previously connected to this instance." />
+                        </TextBlock>
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            Margin="0,4,0,0">
+                            <Run Text="Home Assistant will reuse an existing device even if it has been deleted." />
+                        </TextBlock>
+                        <HyperlinkButton
+                            Content="Launch setup wizard"
+                            Command="{x:Bind ViewModel.NavigateToSetupWizardCommand}"
+                            Margin="0,8,0,0"
+                            BorderThickness="1"
+                            BorderBrush="{ThemeResource TextFillColorSecondaryBrush}"
+                            AutomationProperties.Name="Launch the setup wizard" />
+                    </StackPanel>
+
+
+                    <TextBlock
+                    Text="App Reset"
+                    Margin="4 0 0 0"
+                    Style="{StaticResource BodyLargeStrongTextBlockStyle}" />
+
+                    <StackPanel
+                        Margin="8 0 0 0">
+
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            Margin="0,4,0,0">
+                            <Run Text="This will reset all the app’s settings, and you will need to reconfigure the app and connect it to Home Assistant." />
+                        </TextBlock>
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            Margin="0,4,0,0">
+                            <Run Text="The device ID is regenerated, so the app is recognised by Home Assistant as a completely new device." />
+                        </TextBlock>
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            Margin="0,4,0,0">
+                            <Run Text="This action cannot be undone!" Foreground="Red" />
+                        </TextBlock>
+                        <HyperlinkButton
+                            Content="Reset all settings"
+                            Command="{x:Bind ViewModel.ResetSettingsCommand}"
+                            Margin="0,8,0,0"
+                            BorderThickness="1"
+                            BorderBrush="{ThemeResource TextFillColorSecondaryBrush}"
+                            AutomationProperties.Name="Reset all application settings" />
+                    </StackPanel>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>

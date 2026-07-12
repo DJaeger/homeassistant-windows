@@ -48,6 +48,14 @@ public partial class SettingsViewModel : ObservableObject
         IsRestartRequired = false;
     }
 
+    [RelayCommand]
+    private void ResetSettings()
+    {
+        _settingsService.Reset();
+        LoadSettings();
+        _navigationService.Navigate(typeof(SetupWizardPage));
+    }
+
     partial void OnUpdateIntervalChanged(int value)
     {
         _settingsService.SetAsync("SensorUpdateIntervalSeconds", value);
@@ -100,5 +108,11 @@ public partial class SettingsViewModel : ObservableObject
     private void NavigateToMain()
     {
         _navigationService.Navigate(typeof(MainPage));
+    }
+
+    [RelayCommand]
+    private void NavigateToSetupWizard()
+    {
+        _navigationService.Navigate(typeof(SetupWizardPage));
     }
 }
