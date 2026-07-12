@@ -8,13 +8,16 @@ on:
       - 'docs/**'
       - 'mkdocs.yml'
 
+permissions:    
+  contents: read
+  deployments: write
+  pages: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
 
       - name: Setup Python
         uses: actions/setup-python@v6

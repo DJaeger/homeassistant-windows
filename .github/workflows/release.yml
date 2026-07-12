@@ -8,13 +8,15 @@ on:
         required: true
         default: '2027.7.0'
 
+permissions:    
+  contents: read
+  meta: write
+
 jobs:
   release:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
