@@ -9,8 +9,7 @@ on:
         default: '2027.7.0'
 
 permissions:    
-  contents: read
-  meta: write
+  contents: write
 
 jobs:
   release:
