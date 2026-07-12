@@ -9,9 +9,8 @@ on:
       - 'mkdocs.yml'
 
 permissions:    
-  contents: read
+  contents: write
   deployments: write
-  pages: write
 
 jobs:
   deploy:
