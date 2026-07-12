@@ -51,9 +51,16 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private void ResetSettings()
     {
+        var wasFileLoggingEnabled = IsFileLoggingEnabled;
         _settingsService.Reset();
-        LoadSettings();
-        _navigationService.Navigate(typeof(SetupWizardPage));
+        _startupManager.DisableStartup();
+        if (wasFileLoggingEnabled)
+            _restartCommand.Execute(null);
+        else
+        {
+            LoadSettings();
+            _navigationService.Navigate(typeof(SetupWizardPage));
+        }
     }
 
     partial void OnUpdateIntervalChanged(int value)
