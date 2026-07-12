@@ -37,7 +37,6 @@ jobs:
             -p:PublishReadyToRun=true `
             -p:WindowsPackageType=None `
             -p:WindowsAppSDKSelfContained=true `
-            -p:WindowsSdkPackageVersion=10.0.22621.52 `
             -p:AssemblyVersion=$NumericVersion `
             -p:FileVersion=$NumericVersion `
             -p:InformationalVersion=$Version `
