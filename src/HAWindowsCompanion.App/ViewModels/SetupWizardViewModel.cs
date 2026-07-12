@@ -18,12 +18,12 @@ public partial class SetupWizardViewModel : ObservableObject
     private readonly ISettingsService _settingsService;
     private readonly NavigationService _navigationService;
 
-    [ObservableProperty] private int _currentStep = 0;
-    [ObservableProperty] private bool _isScanning = false;
-    [ObservableProperty] private string _customInstanceUrl = "";
-    [ObservableProperty] private bool _isConnecting = false;
-    [ObservableProperty] private string? _errorMessage;
-    [ObservableProperty] private bool _isConfigured = false;
+    [ObservableProperty] public partial int CurrentStep { get; set; } = 0;
+    [ObservableProperty] public partial bool IsScanning { get; set; } = false;
+    [ObservableProperty] public partial string CustomInstanceUrl { get; set; } = "";
+    [ObservableProperty] public partial bool IsConnecting { get; set; } = false;
+    [ObservableProperty] public partial string? ErrorMessage { get; set; }
+    [ObservableProperty] public partial bool IsConfigured { get; set; } = false;
 
     public SetupWizardViewModel(
         IDiscoveryService discoveryService,
