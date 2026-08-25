@@ -1,0 +1,56 @@
+{
+  "timestamp": "2026-07-10T15:52:23.740885",
+  "features": {
+    "sensors": {
+      "description": "System state sensors (CPU, RAM, Idle Time, Audio, Active Window, SSID) published to Home Assistant.",
+      "files": [
+        "src/HAWindowsCompanion.Infrastructure/Sensors/SensorManager.cs",
+        "src/HAWindowsCompanion.Infrastructure/Sensors/CpuUsageSensor.cs",
+        "src/HAWindowsCompanion.Infrastructure/Sensors/MemoryUsageSensor.cs",
+        "src/HAWindowsCompanion.Infrastructure/Sensors/BatteryStatusSensor.cs",
+        "src/HAWindowsCompanion.Infrastructure/Sensors/ActiveWindowSensor.cs",
+        "src/HAWindowsCompanion.Infrastructure/Sensors/SystemIdleTimeSensor.cs",
+        "src/HAWindowsCompanion.Infrastructure/Sensors/AudioOutputDeviceSensor.cs",
+        "src/HAWindowsCompanion.Infrastructure/Sensors/NetworkSsidSensor.cs",
+        "src/HAWindowsCompanion.Core/Interfaces/ISensorProvider.cs"
+      ]
+    },
+    "commands": {
+      "description": "Bi-directional WebSocket control commands from Home Assistant handled locally.",
+      "files": [
+        "src/HAWindowsCompanion.Infrastructure/Commands/CommandDispatcher.cs",
+        "src/HAWindowsCompanion.Infrastructure/Commands/VolumeCommandHandler.cs",
+        "src/HAWindowsCompanion.Infrastructure/Commands/LockSessionCommandHandler.cs",
+        "src/HAWindowsCompanion.Infrastructure/Commands/ShutdownCommandHandler.cs",
+        "src/HAWindowsCompanion.Infrastructure/Commands/MediaPlayPauseCommandHandler.cs",
+        "src/HAWindowsCompanion.Core/Interfaces/ICommandHandler.cs"
+      ]
+    },
+    "authentication_flow": {
+      "description": "OAuth2 auth callback with loopback HttpListener to obtain access tokens.",
+      "files": [
+        "src/HAWindowsCompanion.Infrastructure/Authentication/OAuth2AuthenticationService.cs",
+        "src/HAWindowsCompanion.Infrastructure/Platform/WindowsCredentialStore.cs",
+        "src/HAWindowsCompanion.Core/Interfaces/IAuthenticationService.cs"
+      ]
+    },
+    "navigation_and_ui": {
+      "description": "MVVM navigation service and WinUI pages (Main, Settings, SetupWizard).",
+      "files": [
+        "src/HAWindowsCompanion.App/Services/NavigationService.cs",
+        "src/HAWindowsCompanion.App/MainWindow.xaml.cs",
+        "src/HAWindowsCompanion.App/Views/MainPage.xaml",
+        "src/HAWindowsCompanion.App/Views/SettingsPage.xaml",
+        "src/HAWindowsCompanion.App/Views/SetupWizardPage.xaml"
+      ]
+    },
+    "logging_system": {
+      "description": "Daily rolling file logger that serializes writes across threads using a shared lock.",
+      "files": [
+        "src/HAWindowsCompanion.Infrastructure/Logging/FileLogger.cs",
+        "src/HAWindowsCompanion.Infrastructure/Logging/FileLoggerProvider.cs",
+        "src/HAWindowsCompanion.Infrastructure/Logging/FileLoggerOptions.cs"
+      ]
+    }
+  }
+}

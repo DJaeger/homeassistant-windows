@@ -12,11 +12,7 @@ namespace HAWindowsCompanion.Infrastructure.Api;
 /// Implements communication with the Home Assistant REST API and webhook endpoints.
 /// Handles device registration, sensor management, and config retrieval via the mobile_app integration.
 /// </summary>
-public sealed class HomeAssistantApiClient(
-        IHttpClientFactory _httpClientFactory,
-        ISettingsService _settingsService,
-        ILogger<HomeAssistantApiClient> _logger
-) : IHomeAssistantClient
+public sealed class HomeAssistantApiClient : IHomeAssistantClient
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -24,6 +20,17 @@ public sealed class HomeAssistantApiClient(
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         WriteIndented = false
     };
+
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger<HomeAssistantApiClient> _logger;
+
+    public HomeAssistantApiClient(
+        IHttpClientFactory httpClientFactory,
+        ILogger<HomeAssistantApiClient> logger)
+    {
+        _httpClientFactory = httpClientFactory;
+        _logger = logger;
+    }
 
     public async Task<HaServerInfo> RegisterDeviceAsync(
         string instanceUrl, string accessToken, DeviceRegistration registration)

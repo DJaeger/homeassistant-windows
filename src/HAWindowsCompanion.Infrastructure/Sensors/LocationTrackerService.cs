@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using HAWindowsCompanion.Core.Interfaces;
 using HAWindowsCompanion.Core.Models;
+using HAWindowsCompanion.Core.Utilities;
 
 namespace HAWindowsCompanion.Infrastructure.Sensors;
 
@@ -11,7 +12,7 @@ public sealed class LocationTrackerService : BackgroundService
     public sealed class LastKnownLocationStatus
     {
         public string LocationName { get; init; } = "unknown";
-        public Dictionary<string, object> Attributes { get; init; } = [];
+        public Dictionary<string, object> Attributes { get; init; } = new();
     }
 
     private static readonly TimeSpan DefaultUpdateInterval = TimeSpan.FromSeconds(60);
@@ -25,7 +26,7 @@ public sealed class LocationTrackerService : BackgroundService
 
     private readonly object _statusLock = new();
     private string _lastLocationName = "unknown";
-    private Dictionary<string, object> _lastAttributes = [];
+    private Dictionary<string, object> _lastAttributes = new();
 
     public LocationTrackerService(
         IHomeAssistantClient haClient,

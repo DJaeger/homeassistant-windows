@@ -58,17 +58,6 @@ public sealed class SettingsService : ISettingsService
         return Task.CompletedTask;
     }
 
-    public Task Reset()
-    {
-        lock (_lock)
-        {
-            _settings = new();
-            Save();
-        }
-        return Task.CompletedTask;
-
-    }
-
     private void Load()
     {
         if (!File.Exists(_settingsFilePath)) return;

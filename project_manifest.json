@@ -1,0 +1,529 @@
+{
+  "project": "HAWindowsCompanion",
+  "purpose": "Home Assistant Windows Companion application running in System Tray, pushing sensors and receiving commands.",
+  "timestamp": "2026-07-10T15:52:23.723679",
+  "stack": {
+    "platform": "WinUI 3 (Windows App SDK)",
+    "runtime": ".NET 10.0-windows",
+    "mvvm_toolkit": "CommunityToolkit.Mvvm"
+  },
+  "architecture": {
+    "viewmodels": [
+      {
+        "name": "MainViewModel",
+        "namespace": "HAWindowsCompanion.App.ViewModels",
+        "inherits": [
+          "ObservableObject"
+        ],
+        "methods": []
+      },
+      {
+        "name": "SettingsViewModel",
+        "namespace": "HAWindowsCompanion.App.ViewModels",
+        "inherits": [
+          "ObservableObject"
+        ],
+        "methods": []
+      },
+      {
+        "name": "SetupWizardViewModel",
+        "namespace": "HAWindowsCompanion.App.ViewModels",
+        "inherits": [
+          "ObservableObject"
+        ],
+        "methods": []
+      }
+    ],
+    "views": [
+      {
+        "name": "MainWindow",
+        "namespace": "HAWindowsCompanion.App",
+        "inherits": [
+          "Window",
+          "IMainWindowCommands"
+        ],
+        "methods": [
+          "NavigateToMainPage",
+          "NavigateToSetupWizard",
+          "NavigateToSettings"
+        ]
+      },
+      {
+        "name": "MainPage",
+        "namespace": "HAWindowsCompanion.App.Views",
+        "inherits": [
+          "Page"
+        ],
+        "methods": []
+      },
+      {
+        "name": "SettingsPage",
+        "namespace": "HAWindowsCompanion.App.Views",
+        "inherits": [
+          "Page"
+        ],
+        "methods": []
+      },
+      {
+        "name": "SetupWizardPage",
+        "namespace": "HAWindowsCompanion.App.Views",
+        "inherits": [
+          "Page"
+        ],
+        "methods": []
+      }
+    ],
+    "sensors": [
+      {
+        "name": "ActiveWindowSensor",
+        "namespace": "HAWindowsCompanion.Infrastructure.Sensors",
+        "inherits": [
+          "ISensorProvider"
+        ],
+        "methods": [
+          "GetRegistration",
+          "GetCurrentState"
+        ]
+      },
+      {
+        "name": "AudioOutputDeviceSensor",
+        "namespace": "HAWindowsCompanion.Infrastructure.Sensors",
+        "inherits": [
+          "ISensorProvider"
+        ],
+        "methods": [
+          "GetRegistration",
+          "GetCurrentState"
+        ]
+      },
+      {
+        "name": "BatteryStatusSensor",
+        "namespace": "HAWindowsCompanion.Infrastructure.Sensors",
+        "inherits": [
+          "ISensorProvider"
+        ],
+        "methods": [
+          "GetRegistration",
+          "GetCurrentState"
+        ]
+      },
+      {
+        "name": "CpuUsageSensor",
+        "namespace": "HAWindowsCompanion.Infrastructure.Sensors",
+        "inherits": [
+          "ISensorProvider"
+        ],
+        "methods": [
+          "GetRegistration",
+          "GetCurrentState"
+        ]
+      },
+      {
+        "name": "MemoryUsageSensor",
+        "namespace": "HAWindowsCompanion.Infrastructure.Sensors",
+        "inherits": [
+          "ISensorProvider"
+        ],
+        "methods": [
+          "GetRegistration",
+          "GetCurrentState"
+        ]
+      },
+      {
+        "name": "NetworkLatencySensor",
+        "namespace": "HAWindowsCompanion.Infrastructure.Sensors",
+        "inherits": [
+          "ISensorProvider"
+        ],
+        "methods": [
+          "GetRegistration",
+          "GetCurrentState"
+        ]
+      },
+      {
+        "name": "NetworkSsidSensor",
+        "namespace": "HAWindowsCompanion.Infrastructure.Sensors",
+        "inherits": [
+          "ISensorProvider"
+        ],
+        "methods": [
+          "GetRegistration",
+          "GetCurrentState"
+        ]
+      },
+      {
+        "name": "SystemIdleTimeSensor",
+        "namespace": "HAWindowsCompanion.Infrastructure.Sensors",
+        "inherits": [
+          "ISensorProvider"
+        ],
+        "methods": [
+          "GetRegistration",
+          "GetCurrentState"
+        ]
+      }
+    ],
+    "command_handlers": [
+      {
+        "name": "LockSessionCommandHandler",
+        "namespace": "HAWindowsCompanion.Infrastructure.Commands",
+        "inherits": [
+          "ICommandHandler"
+        ],
+        "methods": [
+          "ExecuteAsync"
+        ]
+      },
+      {
+        "name": "MediaPlayPauseCommandHandler",
+        "namespace": "HAWindowsCompanion.Infrastructure.Commands",
+        "inherits": [
+          "ICommandHandler"
+        ],
+        "methods": [
+          "ExecuteAsync"
+        ]
+      },
+      {
+        "name": "ShutdownCommandHandler",
+        "namespace": "HAWindowsCompanion.Infrastructure.Commands",
+        "inherits": [
+          "ICommandHandler"
+        ],
+        "methods": [
+          "ExecuteAsync"
+        ]
+      },
+      {
+        "name": "VolumeCommandHandler",
+        "namespace": "HAWindowsCompanion.Infrastructure.Commands",
+        "inherits": [
+          "ICommandHandler"
+        ],
+        "methods": [
+          "ExecuteAsync"
+        ]
+      }
+    ],
+    "services": [
+      {
+        "name": "NavigationService",
+        "namespace": "HAWindowsCompanion.App.Services",
+        "inherits": [],
+        "methods": [
+          "Initialize",
+          "Navigate",
+          "GoBack",
+          "ClearBackStack"
+        ]
+      },
+      {
+        "name": "ToastNotificationService",
+        "namespace": "HAWindowsCompanion.App.Services",
+        "inherits": [
+          "INotificationService"
+        ],
+        "methods": [
+          "ShowNotification"
+        ]
+      },
+      {
+        "name": "ZonesService",
+        "namespace": "HAWindowsCompanion.Infrastructure.Api",
+        "inherits": [
+          "IZonesService"
+        ],
+        "methods": [
+          "GetZonesForLocationAsync"
+        ]
+      },
+      {
+        "name": "OAuth2AuthenticationService",
+        "namespace": "HAWindowsCompanion.Infrastructure.Authentication",
+        "inherits": [
+          "IAuthenticationService"
+        ],
+        "methods": [
+          "AuthorizeAsync",
+          "ExchangeCodeAsync",
+          "RefreshTokenAsync",
+          "RevokeTokenAsync",
+          "CreateFromLongLivedToken",
+          "GetValidAccessTokenAsync"
+        ]
+      },
+      {
+        "name": "CommandDispatcher",
+        "namespace": "HAWindowsCompanion.Infrastructure.Commands",
+        "inherits": [
+          "BackgroundService"
+        ],
+        "methods": []
+      },
+      {
+        "name": "MdnsDiscoveryService",
+        "namespace": "HAWindowsCompanion.Infrastructure.Discovery",
+        "inherits": [
+          "IDiscoveryService"
+        ],
+        "methods": [
+          "DiscoverInstancesAsync"
+        ]
+      },
+      {
+        "name": "SettingsService",
+        "namespace": "HAWindowsCompanion.Infrastructure.Platform",
+        "inherits": [
+          "ISettingsService"
+        ],
+        "methods": [
+          "ContainsKeyAsync",
+          "RemoveAsync"
+        ]
+      },
+      {
+        "name": "StartupManager",
+        "namespace": "HAWindowsCompanion.Infrastructure.Platform",
+        "inherits": [
+          "IStartupManager"
+        ],
+        "methods": [
+          "EnableStartup",
+          "DisableStartup"
+        ]
+      },
+      {
+        "name": "WindowsCredentialStore",
+        "namespace": "HAWindowsCompanion.Infrastructure.Platform",
+        "inherits": [
+          "ICredentialStore"
+        ],
+        "methods": [
+          "SaveTokenAsync",
+          "DeleteTokenAsync",
+          "SaveServerInfoAsync",
+          "DeleteServerInfoAsync"
+        ]
+      },
+      {
+        "name": "LocationTrackerService",
+        "namespace": "HAWindowsCompanion.Infrastructure.Sensors",
+        "inherits": [
+          "BackgroundService"
+        ],
+        "methods": []
+      },
+      {
+        "name": "SensorManager",
+        "namespace": "HAWindowsCompanion.Infrastructure.Sensors",
+        "inherits": [
+          "BackgroundService"
+        ],
+        "methods": []
+      }
+    ],
+    "interfaces": [
+      {
+        "name": "IMainWindowCommands",
+        "namespace": "HAWindowsCompanion.App.Services",
+        "methods": []
+      },
+      {
+        "name": "IAuthenticationService",
+        "namespace": "HAWindowsCompanion.Core.Interfaces",
+        "methods": [
+          "AuthorizeAsync",
+          "ExchangeCodeAsync",
+          "RefreshTokenAsync",
+          "RevokeTokenAsync",
+          "CreateFromLongLivedToken",
+          "GetValidAccessTokenAsync"
+        ]
+      },
+      {
+        "name": "ICommandHandler",
+        "namespace": "HAWindowsCompanion.Core.Interfaces",
+        "methods": [
+          "ExecuteAsync"
+        ]
+      },
+      {
+        "name": "ICredentialStore",
+        "namespace": "HAWindowsCompanion.Core.Interfaces",
+        "methods": [
+          "SaveTokenAsync",
+          "LoadTokenAsync",
+          "DeleteTokenAsync",
+          "SaveServerInfoAsync",
+          "LoadServerInfoAsync",
+          "DeleteServerInfoAsync"
+        ]
+      },
+      {
+        "name": "IDiscoveryService",
+        "namespace": "HAWindowsCompanion.Core.Interfaces",
+        "methods": [
+          "DiscoverInstancesAsync"
+        ]
+      },
+      {
+        "name": "IHomeAssistantClient",
+        "namespace": "HAWindowsCompanion.Core.Interfaces",
+        "methods": [
+          "RegisterDeviceAsync",
+          "RegisterSensorAsync",
+          "UpdateSensorsAsync",
+          "GetConfigAsync",
+          "UpdateRegistrationAsync"
+        ]
+      },
+      {
+        "name": "INotificationService",
+        "namespace": "HAWindowsCompanion.Core.Interfaces",
+        "methods": [
+          "ShowNotification"
+        ]
+      },
+      {
+        "name": "ISensorProvider",
+        "namespace": "HAWindowsCompanion.Core.Interfaces",
+        "methods": [
+          "GetRegistration",
+          "GetCurrentState"
+        ]
+      },
+      {
+        "name": "ISettingsService",
+        "namespace": "HAWindowsCompanion.Core.Interfaces",
+        "methods": [
+          "ContainsKeyAsync",
+          "RemoveAsync"
+        ]
+      },
+      {
+        "name": "IStartupManager",
+        "namespace": "HAWindowsCompanion.Core.Interfaces",
+        "methods": [
+          "EnableStartup",
+          "DisableStartup"
+        ]
+      },
+      {
+        "name": "IZonesService",
+        "namespace": "HAWindowsCompanion.Core.Interfaces",
+        "methods": [
+          "GetZonesAsync",
+          "GetZonesForLocationAsync"
+        ]
+      }
+    ]
+  },
+  "file_tree": {
+    ".": [
+      "AGENTS.MD",
+      "LICENSE",
+      "README.md",
+      "VERSION",
+      "build_release.py",
+      "cliff.toml",
+      "mkdocs.yml"
+    ],
+    "scripts": [
+      "calculate_version.py",
+      "generate_changelog.py",
+      "generate_manifest.py"
+    ],
+    "src/HAWindowsCompanion.App": [
+      "App.xaml",
+      "App.xaml.cs",
+      "MainWindow.xaml",
+      "MainWindow.xaml.cs"
+    ],
+    "src/HAWindowsCompanion.App/Services": [
+      "IMainWindowCommands.cs",
+      "NavigationService.cs",
+      "ToastNotificationService.cs"
+    ],
+    "src/HAWindowsCompanion.App/ViewModels": [
+      "MainViewModel.cs",
+      "SettingsViewModel.cs",
+      "SetupWizardViewModel.cs"
+    ],
+    "src/HAWindowsCompanion.App/Views": [
+      "MainPage.xaml",
+      "MainPage.xaml.cs",
+      "SettingsPage.xaml",
+      "SettingsPage.xaml.cs",
+      "SetupWizardPage.xaml",
+      "SetupWizardPage.xaml.cs"
+    ],
+    "src/HAWindowsCompanion.Core/Interfaces": [
+      "IAuthenticationService.cs",
+      "ICommandHandler.cs",
+      "ICredentialStore.cs",
+      "IDiscoveryService.cs",
+      "IHomeAssistantClient.cs",
+      "INotificationService.cs",
+      "ISensorProvider.cs",
+      "ISettingsService.cs",
+      "IStartupManager.cs",
+      "IZonesService.cs"
+    ],
+    "src/HAWindowsCompanion.Core/Models": [
+      "DeviceRegistration.cs",
+      "DiscoveredInstance.cs",
+      "HaServerInfo.cs",
+      "Location.cs",
+      "SensorRegistration.cs",
+      "SensorUpdate.cs",
+      "TokenInfo.cs",
+      "WebhookRequest.cs",
+      "Zone.cs"
+    ],
+    "src/HAWindowsCompanion.Core/Utilities": [
+      "LocationHelpers.cs"
+    ],
+    "src/HAWindowsCompanion.Infrastructure/Api": [
+      "HomeAssistantApiClient.cs",
+      "ZonesService.cs"
+    ],
+    "src/HAWindowsCompanion.Infrastructure/Authentication": [
+      "OAuth2AuthenticationService.cs"
+    ],
+    "src/HAWindowsCompanion.Infrastructure/Commands": [
+      "CommandDispatcher.cs",
+      "LockSessionCommandHandler.cs",
+      "MediaPlayPauseCommandHandler.cs",
+      "ShutdownCommandHandler.cs",
+      "VolumeCommandHandler.cs"
+    ],
+    "src/HAWindowsCompanion.Infrastructure/Discovery": [
+      "MdnsDiscoveryService.cs"
+    ],
+    "src/HAWindowsCompanion.Infrastructure/Logging": [
+      "FileLogger.cs",
+      "FileLoggerOptions.cs",
+      "FileLoggerProvider.cs"
+    ],
+    "src/HAWindowsCompanion.Infrastructure/Platform": [
+      "SettingsService.cs",
+      "StartupManager.cs",
+      "WindowsCredentialStore.cs"
+    ],
+    "src/HAWindowsCompanion.Infrastructure/Sensors": [
+      "ActiveWindowSensor.cs",
+      "AudioOutputDeviceSensor.cs",
+      "BatteryStatusSensor.cs",
+      "CpuUsageSensor.cs",
+      "LocationTrackerService.cs",
+      "MemoryUsageSensor.cs",
+      "NetworkLatencySensor.cs",
+      "NetworkSsidSensor.cs",
+      "SensorManager.cs",
+      "SystemIdleTimeSensor.cs"
+    ],
+    "src/HAWindowsCompanion.Tests": [
+      "UnitTest1.cs"
+    ]
+  }
+}

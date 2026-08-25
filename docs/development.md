@@ -5,7 +5,7 @@ Thank you for your interest in contributing to the Home Assistant Windows Compan
 ## 🛠️ Prerequisites
 
 - **Windows 10/11**: Developing WinUI 3 apps requires a modern Windows environment.
-- **Visual Studio 2026**: With the "Windows app development" workload installed.
+- **Visual Studio 2022**: With the "Windows app development" workload installed.
 - **.NET 10 SDK**: The latest cutting-edge runtime.
 - **Git**: For version control.
 
@@ -26,7 +26,7 @@ The solution uses **Clean Architecture** to maintain a strict separation of conc
 
 ## 🚀 Getting Started
 
-1. Clone the repository: `git clone https://github.com/DJaeger/homeassistant-windows.git`
+1. Clone the repository: `git clone https://github.com/fabian-be/homeassistant-windows.git`
 2. Open `HAWindowsCompanion.sln` in Visual Studio.
 3. Restore NuGet packages and build the solution.
 4. Run the `App` project.
@@ -40,7 +40,6 @@ dotnet publish src/HAWindowsCompanion.App/HAWindowsCompanion.App.csproj `
   -c Release `
   -r win-x64 `
   -p:PublishSingleFile=true `
-  -p:EnableMsixTooling=true `
   -p:SelfContained=true `
   -p:PublishReadyToRun=true
 ```

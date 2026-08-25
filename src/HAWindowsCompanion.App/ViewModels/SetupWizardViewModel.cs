@@ -18,12 +18,16 @@ public partial class SetupWizardViewModel : ObservableObject
     private readonly ISettingsService _settingsService;
     private readonly NavigationService _navigationService;
 
-    [ObservableProperty] public partial int CurrentStep { get; set; } = 0;
-    [ObservableProperty] public partial bool IsScanning { get; set; } = false;
-    [ObservableProperty] public partial string CustomInstanceUrl { get; set; } = "";
-    [ObservableProperty] public partial bool IsConnecting { get; set; } = false;
-    [ObservableProperty] public partial string? ErrorMessage { get; set; }
-    [ObservableProperty] public partial bool IsConfigured { get; set; } = false;
+    [ObservableProperty] private int _currentStep = 0;
+    [ObservableProperty] private bool _isScanning = false;
+    [ObservableProperty] private string _customInstanceUrl = "";
+    [ObservableProperty] private bool _isConnecting = false;
+    [ObservableProperty] private string? _errorMessage;
+
+    // Computed property for Border.IsHitTestVisible binding
+    public bool IsNotConnecting => !IsConnecting;
+
+    public ObservableCollection<DiscoveredInstance> DiscoveredInstances { get; } = new();
 
     public SetupWizardViewModel(
         IDiscoveryService discoveryService,
@@ -31,8 +35,7 @@ public partial class SetupWizardViewModel : ObservableObject
         IHomeAssistantClient haClient,
         ICredentialStore credentialStore,
         ISettingsService settingsService,
-        NavigationService navigationService
-    )
+        NavigationService navigationService)
     {
         _discoveryService = discoveryService;
         _authService = authService;
@@ -40,19 +43,7 @@ public partial class SetupWizardViewModel : ObservableObject
         _credentialStore = credentialStore;
         _settingsService = settingsService;
         _navigationService = navigationService;
-        LoadSettings();
     }
-
-    private async void LoadSettings()
-    {
-        IsConfigured = await _settingsService.GetAsync<bool>("IsConfigured");
-    }
-
-
-    // Computed property for Border.IsHitTestVisible binding
-    public bool IsNotConnecting => !IsConnecting;
-
-    public ObservableCollection<DiscoveredInstance> DiscoveredInstances { get; } = new();
 
     // Notify IsNotConnecting when IsConnecting changes
     partial void OnIsConnectingChanged(bool value)
@@ -92,29 +83,30 @@ public partial class SetupWizardViewModel : ObservableObject
         string url = instance?.Url ?? CustomInstanceUrl;
         if (string.IsNullOrEmpty(url)) return;
 
-        // Get manufacturer and model using WMI
-        string manufacturer = "N/A";
-        string model = "N/A";
-        ManagementObjectSearcher searcher = new ManagementObjectSearcher($"SELECT * FROM Win32_ComputerSystem");
-        foreach (ManagementObject obj in searcher.Get())
-        {
-            manufacturer = obj["Manufacturer"]?.ToString() ?? "N/A";
-            model = obj["Model"]?.ToString() ?? "N/A";
-        }
-
-        // If DeviceId is not set, generate a new one and save it
-        string? DeviceId = await _settingsService.GetAsync<string>("DeviceId");
-        if (DeviceId == null)
-        {
-            DeviceId = Guid.NewGuid().ToString();
-            await _settingsService.SetAsync("DeviceId", DeviceId);
-        }
-
         IsConnecting = true;
         ErrorMessage = null;
 
+        string manufacturer = "N/A";
+        string model = "N/A";
+
         try
         {
+            // Resolve device manufacturer/model off the UI thread to avoid blocking
+            (manufacturer, model) = await Task.Run(() =>
+            {
+                using var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem");
+                foreach (ManagementObject obj in searcher.Get())
+                {
+                    using (obj)
+                    {
+                        return (
+                            obj["Manufacturer"]?.ToString() ?? "N/A",
+                            obj["Model"]?.ToString() ?? "N/A"
+                        );
+                    }
+                }
+                return ("N/A", "N/A");
+            });
             // 1. Authenticate
             var code = await _authService.AuthorizeAsync(url);
             var tokens = await _authService.ExchangeCodeAsync(url, code);
@@ -122,7 +114,7 @@ public partial class SetupWizardViewModel : ObservableObject
             // 2. Register Device
             var registration = new DeviceRegistration
             {
-                DeviceId = DeviceId,
+                DeviceId = Guid.NewGuid().ToString(),
                 AppVersion = System.Reflection.Assembly.GetExecutingAssembly()
                     .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
                     .Cast<System.Reflection.AssemblyInformationalVersionAttribute>()
@@ -157,11 +149,4 @@ public partial class SetupWizardViewModel : ObservableObject
             IsConnecting = false;
         }
     }
-
-    [RelayCommand]
-    private void NavigateToSettings()
-    {
-        _navigationService.Navigate(typeof(SettingsPage));
-    }
-
 }

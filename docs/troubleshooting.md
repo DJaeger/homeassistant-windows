@@ -7,7 +7,6 @@ Encountering issues? Follow this guide to resolve common problems with the Windo
 ### Instance Not Discovered
 - **mDNS/Zeroconf**: Ensure the `zeroconf` integration is enabled in your `configuration.yaml` (it is enabled by default in `default_config:`).
 - **Subnets**: mDNS often doesn't cross between different VLANs or subnets without an mDNS reflector/repeater.
-- **Multiple Interfaces**: By default, Home Assistant only supports mDNS on the primary interface and, consequently, only on the primary network
 - **Manual Entry**: If discovery fails, you can always enter your URL manually in the format `http://192.168.1.x:8123`.
 
 ### "Connection Refused" or Timeouts
@@ -46,22 +45,22 @@ File logging is **disabled by default** to save storage space. You can enable it
 
 After activation, all logs are automatically saved to:
 
-```
+```text
 %LOCALAPPDATA%\HAWindowsCompanion\logs\
 ```
 
-You can open the folder directly via the **"Open Log-Folder"** button in Settings.
+You can open the folder directly via the **"Open Log Folder"** button in Settings.
 
 ### Log Format
 
 Each log line follows this format:
 
-```
+```text
 [YYYY-MM-DD HH:mm:ss] [LogLevel] Category: Message
 ```
 
 **Example:**
-```
+```log
 [2026-03-15 14:23:45] [Information] HAWindowsCompanion.Infrastructure.Commands.CommandDispatcher: CommandDispatcher service starting...
 [2026-03-15 14:23:46] [Warning] HAWindowsCompanion.Infrastructure.Sensors.SensorManager: Failed to update sensor battery_level
 [2026-03-15 14:23:47] [Error] HAWindowsCompanion.Infrastructure.Api.HomeAssistantApiClient: Connection refused
@@ -86,7 +85,7 @@ When reporting a problem on GitHub, please include the relevant log files:
 
 1. Enable file logging (if not already enabled)
 2. Reproduce the issue
-3. Open the log folder via **"Open Log-Folder"**
+3. Open the log folder via **"Open Log Folder"**
 4. Upload the most recent `app-YYYY-MM-DD.log` file
 
 **Note:** Please check the logs for sensitive information (e.g., passwords, API keys) before sharing them publicly.

@@ -1,10 +1,10 @@
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HAWindowsCompanion.App.Services;
 using HAWindowsCompanion.App.Views;
 using HAWindowsCompanion.Core.Interfaces;
+using HAWindowsCompanion.Core.Models;
 using HAWindowsCompanion.Infrastructure.Sensors;
 
 namespace HAWindowsCompanion.App.ViewModels;
@@ -15,10 +15,9 @@ public partial class MainViewModel : ObservableObject
     private readonly ICredentialStore _credentialStore;
     private readonly LocationTrackerService _locationTrackerService;
     private readonly NavigationService _navigationService;
-    private readonly IMainWindowCommands _mainWindowCommands;
 
-    [ObservableProperty] public partial string ConnectionStatus { get; set; } = "Disconnected";
-    [ObservableProperty] public partial string ServerUrl { get; set; } = "Not configured";
+    [ObservableProperty] private string _connectionStatus = "Disconnected";
+    [ObservableProperty] private string _serverUrl = "Not configured";
 
     public ObservableCollection<SensorInfo> ActiveSensors { get; } = new();
 
@@ -26,22 +25,18 @@ public partial class MainViewModel : ObservableObject
         IEnumerable<ISensorProvider> sensors,
         ICredentialStore credentialStore,
         LocationTrackerService locationTrackerService,
-        NavigationService navigationService,
-        IMainWindowCommands mainWindowCommands)
+        NavigationService navigationService)
     {
         _sensors = sensors;
         _credentialStore = credentialStore;
         _locationTrackerService = locationTrackerService;
         _navigationService = navigationService;
-        _mainWindowCommands = mainWindowCommands;
 
         _ = LoadStatusAsync(); // Intentionally not awaited because asynchronous work cannot be awaited in the constructor.
     }
 
     [RelayCommand]
     private void OpenSettings() => _navigationService.Navigate(typeof(SettingsPage));
-    public ICommand QuitApplicationCommand => _mainWindowCommands.QuitCommand;
-
 
     private async Task LoadStatusAsync()
     {
@@ -56,14 +51,11 @@ public partial class MainViewModel : ObservableObject
 
             foreach (var sensor in _sensors)
             {
-                if (sensor.IsEnabled)
-                {
-                    ActiveSensors.Add(new SensorInfo 
-                    { 
-                        Name = sensor.Name, 
-                        Value = sensor.GetCurrentState().State?.ToString() ?? "N/A" 
-                    });
-                }
+                ActiveSensors.Add(new SensorInfo 
+                { 
+                    Name = sensor.Name, 
+                    Value = sensor.GetCurrentState().State?.ToString() ?? "N/A" 
+                });
             }
 
             var trackerSnapshot = _locationTrackerService.CurrentStatus;
@@ -94,7 +86,7 @@ public partial class MainViewModel : ObservableObject
     {
         if (attributes is null || attributes.Count == 0)
         {
-            return "Keine Attribute verfügbar";
+            return "No attributes available";
         }
 
         var lines = new List<string>();

@@ -15,10 +15,10 @@ public partial class SettingsViewModel : ObservableObject
     private readonly NavigationService _navigationService;
     private readonly ICommand _restartCommand;
 
-    [ObservableProperty] public partial int UpdateInterval { get; set; } = 60;
-    [ObservableProperty] public partial bool LaunchAtStartup { get; set; }
-    [ObservableProperty] public partial bool IsFileLoggingEnabled { get; set; }
-    [ObservableProperty] public partial bool IsRestartRequired { get; set; }
+    [ObservableProperty] private int _updateInterval = 60;
+    [ObservableProperty] private bool _launchAtStartup;
+    [ObservableProperty] private bool _isFileLoggingEnabled;
+    [ObservableProperty] private bool _isRestartRequired;
 
     public SettingsViewModel(
         ISettingsService settingsService, 
@@ -37,29 +37,23 @@ public partial class SettingsViewModel : ObservableObject
 
     private async void LoadSettings()
     {
-        UpdateInterval = await _settingsService.GetAsync<int>("SensorUpdateIntervalSeconds");
-        if (UpdateInterval == 0) UpdateInterval = 60;
-        LaunchAtStartup = _startupManager.IsStartupEnabled;
-
-        // Load file logging setting
-        IsFileLoggingEnabled = await _settingsService.GetAsync<bool>("IsFileLoggingEnabled");
-
-        // Restart is not required initially
-        IsRestartRequired = false;
-    }
-
-    [RelayCommand]
-    private void ResetSettings()
-    {
-        var wasFileLoggingEnabled = IsFileLoggingEnabled;
-        _settingsService.Reset();
-        _startupManager.DisableStartup();
-        if (wasFileLoggingEnabled)
-            _restartCommand.Execute(null);
-        else
+        try
         {
-            LoadSettings();
-            _navigationService.Navigate(typeof(SetupWizardPage));
+            UpdateInterval = await _settingsService.GetAsync<int>("SensorUpdateIntervalSeconds");
+            if (UpdateInterval == 0) UpdateInterval = 60;
+            LaunchAtStartup = _startupManager.IsStartupEnabled;
+
+            // Load file logging setting
+            IsFileLoggingEnabled = await _settingsService.GetAsync<bool>("IsFileLoggingEnabled");
+
+            // Restart is not required initially
+            IsRestartRequired = false;
+        }
+        catch (Exception ex)
+        {
+            // Apply safe defaults so the settings page remains usable
+            if (UpdateInterval == 0) UpdateInterval = 60;
+            _ = ex; // Exception is swallowed — settings load is best-effort
         }
     }
 
@@ -115,11 +109,5 @@ public partial class SettingsViewModel : ObservableObject
     private void NavigateToMain()
     {
         _navigationService.Navigate(typeof(MainPage));
-    }
-
-    [RelayCommand]
-    private void NavigateToSetupWizard()
-    {
-        _navigationService.Navigate(typeof(SetupWizardPage));
     }
 }

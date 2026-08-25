@@ -6,16 +6,16 @@ internal sealed class FileLogger : ILogger
 {
     private readonly string _categoryName;
     private readonly FileLoggerOptions _options;
-    private readonly object _lock = new();
+    private readonly object _lock;
     private string? _currentLogFile;
     private DateTime _currentLogDate;
 
-    public FileLogger(string categoryName, FileLoggerOptions options)
+    public FileLogger(string categoryName, FileLoggerOptions options, object sharedLock)
     {
         _categoryName = categoryName;
         _options = options;
+        _lock = sharedLock;
         EnsureLogDirectory();
-        CleanupOldLogs();
     }
 
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
@@ -75,28 +75,5 @@ internal sealed class FileLogger : ILogger
         }
     }
 
-    private void CleanupOldLogs()
-    {
-        try
-        {
-            var cutoffDate = DateTime.Now.AddDays(-_options.RetentionDays);
-            if (!Directory.Exists(_options.LogDirectory))
-                return;
-
-            var logFiles = Directory.GetFiles(_options.LogDirectory, "app-*.log");
-
-            foreach (var file in logFiles)
-            {
-                var fileInfo = new FileInfo(file);
-                if (fileInfo.LastWriteTime < cutoffDate)
-                {
-                    File.Delete(file);
-                }
-            }
-        }
-        catch
-        {
-            // Fail silently
-        }
-    }
 }
+
